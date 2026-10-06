@@ -101,12 +101,14 @@ jobs:
         uses: google-github-actions/setup-gcloud@v2
 
       - name: Deploy on Compute Engine Instance
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gcloud compute ssh "${{ vars.GCE_DEPLOY_USER }}@${{ vars.GCE_INSTANCE }}" \
             --zone="${{ vars.GCE_ZONE }}" \
             --project="${{ vars.GCP_PROJECT_ID }}" \
             --tunnel-through-iap \
-            --command="sudo /opt/forum-api/deploy/deploy-on-vm.sh"
+            --command="sudo GITHUB_TOKEN='${GH_TOKEN}' /opt/forum-api/deploy/deploy-on-vm.sh"
 
       - name: Smoke Test (Health Check HTTPS)
         run: |

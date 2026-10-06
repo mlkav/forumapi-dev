@@ -7,6 +7,11 @@ deploy_branch=${DEPLOY_BRANCH:-main}
 
 git config --global --add safe.directory "$app_dir" || true
 cd "$app_dir"
+
+if [ -n "${GITHUB_TOKEN:-}" ]; then
+  git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/mlkav/forumapi-dev.git"
+fi
+
 git fetch origin "$deploy_branch"
 git merge --ff-only FETCH_HEAD
 npm ci --omit=dev
