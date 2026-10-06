@@ -108,7 +108,7 @@ jobs:
             --zone="${{ vars.GCE_ZONE }}" \
             --project="${{ vars.GCP_PROJECT_ID }}" \
             --tunnel-through-iap \
-            --command="sudo GITHUB_TOKEN='${GH_TOKEN}' /opt/forum-api/deploy/deploy-on-vm.sh"
+            --command="sudo git config --global --add safe.directory /opt/forum-api && sudo git -C /opt/forum-api remote set-url origin 'https://x-access-token:${GH_TOKEN}@github.com/mlkav/forumapi-dev.git' && sudo GITHUB_TOKEN='${GH_TOKEN}' /opt/forum-api/deploy/deploy-on-vm.sh"
 
       - name: Smoke Test (Health Check HTTPS)
         run: |
