@@ -12,6 +12,7 @@
     "test:coverage": "NODE_ENV=test TEST_PGDATABASE=forumapi_test vitest --coverage",
     "migrate": "node-pg-migrate",
     "migrate:test": "NODE_ENV=test PGDATABASE=forumapi_test node-pg-migrate",
+    "create-db:prod": "node create-db-prod.js",
     "lint": "eslint ./"
   },
   "keywords": [],
