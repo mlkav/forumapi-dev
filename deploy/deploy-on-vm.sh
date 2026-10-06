@@ -13,6 +13,7 @@ if [ -n "${GITHUB_TOKEN:-}" ]; then
 fi
 
 git fetch origin "$deploy_branch"
+git reset --hard "origin/$deploy_branch"
 git merge --ff-only FETCH_HEAD
 npm ci --omit=dev
 chown -R forum-api:forum-api "$app_dir"
