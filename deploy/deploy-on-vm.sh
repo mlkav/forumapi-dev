@@ -5,6 +5,7 @@ app_dir=/opt/forum-api
 environment_file=/etc/forum-api/forum-api.env
 deploy_branch=${DEPLOY_BRANCH:-main}
 
+git config --global --add safe.directory "$app_dir" || true
 cd "$app_dir"
 git fetch origin "$deploy_branch"
 git merge --ff-only FETCH_HEAD
