@@ -133,6 +133,10 @@ gcloud projects add-iam-policy-binding "$PROJECT_ID" \
   --member="serviceAccount:${DEPLOY_SA_EMAIL}" \
   --role="roles/iap.tunnelResourceAccessor"
 
+gcloud projects add-iam-policy-binding "$PROJECT_ID" \
+  --member="serviceAccount:${DEPLOY_SA_EMAIL}" \
+  --role="roles/iam.serviceAccountUser"
+
 if ! gcloud iam workload-identity-pools describe "$POOL_NAME" --location="global" &>/dev/null; then
   gcloud iam workload-identity-pools create "$POOL_NAME" \
     --location="global" \

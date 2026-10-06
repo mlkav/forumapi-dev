@@ -264,6 +264,10 @@ gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
   --member="serviceAccount:github-deploy-sa@${PROJECT_ID}.iam.gserviceaccount.com" \
   --role="roles/iap.tunnelResourceAccessor"
 
+gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
+  --member="serviceAccount:github-deploy-sa@${PROJECT_ID}.iam.gserviceaccount.com" \
+  --role="roles/iam.serviceAccountUser"
+
 # 3. Buat Workload Identity Pool
 gcloud iam workload-identity-pools create "github-pool" \
   --project="${PROJECT_ID}" \
