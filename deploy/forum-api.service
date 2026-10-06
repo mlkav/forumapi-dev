@@ -1,0 +1,23 @@
+[Unit]
+Description=Forum API service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=forum-api
+Group=forum-api
+WorkingDirectory=/opt/forum-api
+EnvironmentFile=/etc/forum-api/forum-api.env
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/node src/app.js
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+UMask=0027
+
+[Install]
+WantedBy=multi-user.target

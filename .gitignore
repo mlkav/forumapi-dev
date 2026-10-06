@@ -1,0 +1,12 @@
+node_modules
+package-lock.json
+.idea
+.env.*
+!.env.example
+config/database/test.json
+config/database/production.json
+coverage
+*.pem
+*.key
+service-account*.json
+.env
