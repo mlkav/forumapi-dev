@@ -64,9 +64,13 @@ if ! gcloud sql databases describe "$DB_NAME" --instance="$DB_INSTANCE_NAME" &>/
   gcloud sql databases create "$DB_NAME" --instance="$DB_INSTANCE_NAME"
 fi
 
-echo "==> Membuat User Database ($DB_USER)..."
+echo "==> Membuat/Update User Database ($DB_USER)..."
 if ! gcloud sql users describe "$DB_USER" --instance="$DB_INSTANCE_NAME" &>/dev/null; then
   gcloud sql users create "$DB_USER" \
+    --instance="$DB_INSTANCE_NAME" \
+    --password="$DB_USER_PASSWORD"
+else
+  gcloud sql users set-password "$DB_USER" \
     --instance="$DB_INSTANCE_NAME" \
     --password="$DB_USER_PASSWORD"
 fi
@@ -231,6 +235,7 @@ sudo tee /etc/sudoers.d/forum-api-deploy > /dev/null <<EOT
 \$USER ALL=(ALL) NOPASSWD: /usr/bin/systemctl restart forum-api.service, /opt/forum-api/deploy/deploy-on-vm.sh
 EOT
 
+sudo chmod +x /opt/forum-api/deploy/deploy-on-vm.sh
 sudo /opt/forum-api/deploy/deploy-on-vm.sh
 EOF
 echo "----------------------------------------------------------------------"

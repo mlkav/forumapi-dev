@@ -9,6 +9,8 @@ cd "$app_dir"
 git fetch origin "$deploy_branch"
 git merge --ff-only FETCH_HEAD
 npm ci --omit=dev
+chown -R forum-api:forum-api "$app_dir"
+chmod -R 755 "$app_dir"
 
 set -a
 # This file is provisioned on the VM and is never stored in the repository.
