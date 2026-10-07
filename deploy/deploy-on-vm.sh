@@ -39,8 +39,11 @@ unset DATABASE_URL
 
 sudo -n /usr/bin/systemctl restart forum-api.service
 
+sleep 10
+
 for attempt in {1..10}; do
-  if curl --fail --silent --show-error http://127.0.0.1:3000/health >/dev/null; then
+  if curl --fail --silent http://127.0.0.1:3000/health >/dev/null 2>&1; then
+    echo "Forum API is healthy and listening on port 3000."
     exit 0
   fi
   sleep 3
