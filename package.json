@@ -13,8 +13,8 @@
     "test:coverage": "NODE_ENV=test TEST_PGDATABASE=forumapi_test vitest --coverage",
     "migrate": "node-pg-migrate",
     "migrate:test": "NODE_ENV=test PGDATABASE=forumapi_test node-pg-migrate",
-    "create-db:prod": "node create-db-prod.js",
-    "create-db:test": "node create-db-test.js",
+    "create-db:prod": "node ./scripts/create-db-prod.js",
+    "create-db:test": "node ./scripts/create-db-test.js",
     "lint": "eslint ./",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
