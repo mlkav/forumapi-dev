@@ -105,3 +105,5 @@ The CI workflow runs lint, dependency auditing, migrations, tests, and coverage 
    ![forum-api.service](./images/forum-api.service.png)
    ![cloud-sql-proxy.service](./images/cloud-sql-proxy.service.png)
    ![forumapi-postman](./images/forumapi-postman.png)
+   ![pr-failed](./images/pr-failed.png)
+   ![pr-success](./images/pr-success.png)
