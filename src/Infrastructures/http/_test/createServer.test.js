@@ -14,6 +14,7 @@ describe('HTTP server', () => {
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
       status: 'success',
+      timestamp: expect.any(String),
     });
   });
 
