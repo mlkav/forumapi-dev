@@ -13,7 +13,7 @@ const createServer = async (container) => {
 
   // Register routes
   app.get('/health', (_req, res) => {
-    res.json({ status: 'success', timestamp: new Date().toISOString() });
+    res.json({ status: 'success' });
   });
   app.use('/users', users(container));
   app.use('/authentications', authentications(container));
