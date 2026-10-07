@@ -4,20 +4,20 @@ Forum API dibangun dengan Node.js, Express, PostgreSQL, dan Clean Architecture. 
 
 ## Fitur dan route
 
-| Method | Route | Access |
-| --- | --- | --- |
-| `POST` | `/users` | Public |
-| `POST` | `/authentications` | Public |
-| `PUT` | `/authentications` | Refresh token |
-| `DELETE` | `/authentications` | Authenticated |
-| `POST` | `/threads` | Authenticated |
-| `GET` | `/threads/{threadId}` | Public |
-| `POST` | `/threads/{threadId}/comments` | Authenticated |
-| `DELETE` | `/threads/{threadId}/comments/{commentId}` | Authenticated, owner |
-| `PUT` | `/threads/{threadId}/comments/{commentId}/likes` | Authenticated |
-| `POST` | `/threads/{threadId}/comments/{commentId}/replies` | Authenticated |
-| `DELETE` | `/threads/{threadId}/comments/{commentId}/replies/{replyId}` | Authenticated, owner |
-| `GET` | `/health` | Public liveness check |
+| Method   | Route                                                        | Access                |
+| -------- | ------------------------------------------------------------ | --------------------- |
+| `POST`   | `/users`                                                     | Public                |
+| `POST`   | `/authentications`                                           | Public                |
+| `PUT`    | `/authentications`                                           | Refresh token         |
+| `DELETE` | `/authentications`                                           | Authenticated         |
+| `POST`   | `/threads`                                                   | Authenticated         |
+| `GET`    | `/threads/{threadId}`                                        | Public                |
+| `POST`   | `/threads/{threadId}/comments`                               | Authenticated         |
+| `DELETE` | `/threads/{threadId}/comments/{commentId}`                   | Authenticated, owner  |
+| `PUT`    | `/threads/{threadId}/comments/{commentId}/likes`             | Authenticated         |
+| `POST`   | `/threads/{threadId}/comments/{commentId}/replies`           | Authenticated         |
+| `DELETE` | `/threads/{threadId}/comments/{commentId}/replies/{replyId}` | Authenticated, owner  |
+| `GET`    | `/health`                                                    | Public liveness check |
 
 `PUT .../likes` men-toggle state untuk user pada access token: request pertama membuat like dan request berikutnya menghapusnya. Like terikat pada pasangan user/comment yang unik. Transaksi mengunci comment aktif agar toggle berurutan dengan aman. `GET /threads/{threadId}` mengembalikan `likeCount` integer yang dihitung dari PostgreSQL untuk setiap comment, termasuk comment yang di-soft-delete.
 
@@ -31,14 +31,14 @@ Forum API dibangun dengan Node.js, Express, PostgreSQL, dan Clean Architecture. 
 
 Salin `.env.example` ke `.env`, lalu isi nilai lokal. Jangan commit `.env` atau credential.
 
-| Variable | Keterangan |
-| --- | --- |
-| `NODE_ENV` | `development`, `test`, atau `production` |
-| `PORT` | Port HTTP aplikasi |
-| `PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`, `PGDATABASE` | Koneksi database environment aktif |
-| `TEST_PGDATABASE` | Nama database terisolasi untuk test; wajib berakhiran `_test` |
-| `ACCESS_TOKEN_KEY`, `REFRESH_TOKEN_KEY` | Signing key berbeda dan rahasia |
-| `ACCESS_TOKEN_AGE` | Lifetime access token, misalnya `1h` |
+| Variable                                                 | Keterangan                                                    |
+| -------------------------------------------------------- | ------------------------------------------------------------- |
+| `NODE_ENV`                                               | `development`, `test`, atau `production`                      |
+| `PORT`                                                   | Port HTTP aplikasi                                            |
+| `PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`, `PGDATABASE` | Koneksi database environment aktif                            |
+| `TEST_PGDATABASE`                                        | Nama database terisolasi untuk test; wajib berakhiran `_test` |
+| `ACCESS_TOKEN_KEY`, `REFRESH_TOKEN_KEY`                  | Signing key berbeda dan rahasia                               |
+| `ACCESS_TOKEN_AGE`                                       | Lifetime access token, misalnya `1h`                          |
 
 Untuk production, atur variable tersebut di file environment yang hanya tersedia pada VM, bukan di image, workflow, atau repository. Gunakan database production terpisah dari `forumapi_test`.
 
@@ -138,6 +138,7 @@ Deployment yang disediakan menargetkan Compute Engine dengan systemd, NGINX reve
    ```
 
    Simpan aturan dengan `visudo -f /etc/sudoers.d/forum-api-deploy` dan pastikan file mode `0440`. Script fetch/fast-forward source, instal dependency produksi, membangun `DATABASE_URL` sementara dari environment VM untuk menjalankan migration additive, restart systemd, dan menunggu health endpoint.
+
 6. Konfigurasikan Git deploy key read-only pada VM. Jangan menyalin service account key atau production `.env` ke repository.
 
 ### 3. Pasang NGINX dan HTTPS
@@ -150,6 +151,7 @@ Deployment yang disediakan menargetkan Compute Engine dengan systemd, NGINX reve
    ```
 
    Konfigurasi meneruskan request ke `127.0.0.1:3000` dan membatasi `/threads` beserta path turunannya menjadi `90 request/menit per alamat sumber`. Request yang melampaui limit mendapat HTTP `429`.
+
 2. Terbitkan sertifikat TLS Let's Encrypt untuk domain tersebut, misalnya dengan Certbot NGINX plugin. Ikuti perubahan yang dihasilkan Certbot dan pastikan konfigurasi TLS final tetap menerapkan `limit_req_zone` dan `limit_req` pada virtual host HTTPS untuk `/threads` serta seluruh child path.
 3. Atur redirect HTTP ke HTTPS setelah sertifikat aktif. Pastikan sertifikat dan private key berada di lokasi yang dikelola Certbot, bukan di repository; ulangi `sudo nginx -t` dan reload.
 4. Verifikasi secara terbatas:

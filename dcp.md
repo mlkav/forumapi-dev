@@ -1,16 +1,17 @@
 ======================================================================
- NILAI UNTUK GITHUB REPOSITORY (SETTINGS -> ENVIRONMENTS -> production)
+NILAI UNTUK GITHUB REPOSITORY (SETTINGS -> ENVIRONMENTS -> production)
 ======================================================================
+
 ENVIRONMENT SECRET:
-  GCP_WIF_PROVIDER           : projects/187732965900/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+GCP_WIF_PROVIDER : projects/187732965900/locations/global/workloadIdentityPools/github-pool/providers/github-provider
 
 ENVIRONMENT VARIABLES:
-  GCP_DEPLOY_SERVICE_ACCOUNT : github-deploy-sa@rnlkav-forumapi.iam.gserviceaccount.com
-  GCP_PROJECT_ID             : rnlkav-forumapi
-  GCE_INSTANCE               : forum-api-vm
-  GCE_ZONE                   : asia-southeast2-a
-  GCE_DEPLOY_USER            : ubuntu
-  FORUM_API_HTTPS_URL        : https://api.domainanda.com
+GCP_DEPLOY_SERVICE_ACCOUNT : github-deploy-sa@rnlkav-forumapi.iam.gserviceaccount.com
+GCP_PROJECT_ID : rnlkav-forumapi
+GCE_INSTANCE : forum-api-vm
+GCE_ZONE : asia-southeast2-a
+GCE_DEPLOY_USER : ubuntu
+FORUM_API_HTTPS_URL : https://api.domainanda.com
 ======================================================================
 
 sudo apt update && sudo apt upgrade -y

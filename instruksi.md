@@ -1,13 +1,13 @@
 # Panduan Deployment GCP: Compute Engine & Cloud SQL (PostgreSQL)
 
-Dokumen ini berisi panduan langkah demi langkah untuk melakukan *deployment* **Forum API** ke **Google Cloud Platform (GCP)** menggunakan **Compute Engine (VM)**, **Cloud SQL PostgreSQL**, dan **GitHub Actions (CD)** dengan Workload Identity Federation (WIF).
+Dokumen ini berisi panduan langkah demi langkah untuk melakukan _deployment_ **Forum API** ke **Google Cloud Platform (GCP)** menggunakan **Compute Engine (VM)**, **Cloud SQL PostgreSQL**, dan **GitHub Actions (CD)** dengan Workload Identity Federation (WIF).
 
 ---
 
 ## 🏛️ Arsitektur Singkat
 
 ```
-[ Client / Browser ] 
+[ Client / Browser ]
         │ (HTTPS Port 443)
         ▼
 [ NGINX Reverse Proxy + SSL Certbot ] ──► [ Forum API (Node.js Port 3000) ]
@@ -24,11 +24,13 @@ Dokumen ini berisi panduan langkah demi langkah untuk melakukan *deployment* **F
 ## 🚀 Langkah 1: Setup Cloud SQL (PostgreSQL)
 
 1. **Aktifkan API Cloud SQL**:
+
    ```bash
    gcloud services enable sqladmin.googleapis.com compute.googleapis.com
    ```
 
 2. **Buat Instance Cloud SQL PostgreSQL**:
+
    ```bash
    gcloud sql instances create forum-db-instance \
      --database-version=POSTGRES_16 \
@@ -39,11 +41,13 @@ Dokumen ini berisi panduan langkah demi langkah untuk melakukan *deployment* **F
    ```
 
 3. **Buat Database Production**:
+
    ```bash
    gcloud sql databases create forumapi --instance=forum-db-instance
    ```
 
 4. **Buat User Database Aplikasi**:
+
    ```bash
    gcloud sql users create forum_user \
      --instance=forum-db-instance \
@@ -55,13 +59,14 @@ Dokumen ini berisi panduan langkah demi langkah untuk melakukan *deployment* **F
    ```bash
    gcloud sql instances describe forum-db-instance --format='value(connectionName)'
    ```
-   *Contoh output:* `my-gcp-project:asia-southeast2:forum-db-instance`
+   _Contoh output:_ `my-gcp-project:asia-southeast2:forum-db-instance`
 
 ---
 
 ## 💻 Langkah 2: Setup Compute Engine (VM)
 
 1. **Buat Service Account untuk VM**:
+
    ```bash
    gcloud iam service-accounts create forum-vm-sa \
      --display-name="Forum VM Service Account"
@@ -73,6 +78,7 @@ Dokumen ini berisi panduan langkah demi langkah untuk melakukan *deployment* **F
    ```
 
 2. **Buat Instance Compute Engine (Ubuntu 24.04 LTS)**:
+
    ```bash
    gcloud compute instances create forum-api-vm \
      --zone=asia-southeast2-a \
@@ -96,6 +102,7 @@ Dokumen ini berisi panduan langkah demi langkah untuk melakukan *deployment* **F
 ## 🛠️ Langkah 3: Konfigurasi di dalam VM
 
 Masuk ke dalam VM melalui SSH:
+
 ```bash
 gcloud compute ssh forum-api-vm --zone=asia-southeast2-a
 ```
@@ -103,6 +110,7 @@ gcloud compute ssh forum-api-vm --zone=asia-southeast2-a
 Jalankan perintah berikut di dalam VM:
 
 ### 3.1. Install Dependensi Dasar & Node.js 22
+
 ```bash
 # Update sistem
 sudo apt update && sudo apt upgrade -y
@@ -114,6 +122,7 @@ sudo apt install -y nodejs
 ```
 
 ### 3.2. Install & Konfigurasi Cloud SQL Auth Proxy
+
 Cloud SQL Auth Proxy mengamankan koneksi dari VM ke Cloud SQL tanpa perlu membuat IP publik database terbuka.
 
 ```bash
@@ -145,6 +154,7 @@ sudo systemctl enable --now cloud-sql-proxy.service
 ```
 
 ### 3.3. Persiapkan Direktori Aplikasi & User
+
 ```bash
 # Buat user sistem untuk forum-api
 sudo useradd -r -s /bin/false forum-api || true
@@ -163,6 +173,7 @@ sudo chmod -R 755 /opt/forum-api
 ```
 
 ### 3.4. Buat File Environment (`/etc/forum-api/forum-api.env`)
+
 ```bash
 sudo mkdir -p /etc/forum-api
 
@@ -187,6 +198,7 @@ sudo chmod 640 /etc/forum-api/forum-api.env
 ```
 
 ### 3.5. Pasang Systemd Service Aplikasi
+
 ```bash
 # Salin file service dari folder repository
 sudo cp /opt/forum-api/deploy/forum-api.service /etc/systemd/system/forum-api.service
@@ -196,7 +208,9 @@ sudo systemctl enable forum-api.service
 ```
 
 ### 3.6. Konfigurasi Sudoers untuk Deployment Tanpa Password
+
 Agar runner CI/CD dapat merestart service tanpa prompt password:
+
 ```bash
 sudo bash -c 'cat <<EOF > /etc/sudoers.d/forum-api-deploy
 $USER ALL=(ALL) NOPASSWD: /usr/bin/systemctl restart forum-api.service, /opt/forum-api/deploy/deploy-on-vm.sh
@@ -208,6 +222,7 @@ EOF'
 ## 🌐 Langkah 4: Setup NGINX Reverse Proxy & HTTPS (Certbot)
 
 1. **Buat Konfigurasi NGINX** (`/etc/nginx/sites-available/forum-api`):
+
    ```bash
    sudo bash -c 'cat <<EOF > /etc/nginx/sites-available/forum-api
    server {
@@ -305,19 +320,21 @@ gcloud iam workload-identity-pools providers describe "github-provider" \
 Buka repository GitHub Anda ➔ **Settings** ➔ **Environments** ➔ Buat Environment dengan nama **`production`**.
 
 Isi **Environment Secret**:
-| Secret Name | Value |
-| :--- | :--- |
+
+| Secret Name        | Value                                                                                                                                 |
+| :----------------- | :------------------------------------------------------------------------------------------------------------------------------------ |
 | `GCP_WIF_PROVIDER` | Output Resource Name dari langkah 5.6 (`projects/12345/locations/global/workloadIdentityPools/github-pool/providers/github-provider`) |
 
 Isi **Environment Variables**:
-| Variable Name | Value | Contoh |
-| :--- | :--- | :--- |
+
+| Variable Name                | Value                            | Contoh                                                |
+| :--------------------------- | :------------------------------- | :---------------------------------------------------- |
 | `GCP_DEPLOY_SERVICE_ACCOUNT` | Email Service Account deployment | `github-deploy-sa@my-project.iam.gserviceaccount.com` |
-| `GCP_PROJECT_ID` | GCP Project ID | `my-gcp-project` |
-| `GCE_INSTANCE` | Nama VM Instance Compute Engine | `forum-api-vm` |
-| `GCE_ZONE` | Zone Compute Engine | `asia-southeast2-a` |
-| `GCE_DEPLOY_USER` | Username SSH di VM | `ubuntu` atau `ald` |
-| `FORUM_API_HTTPS_URL` | Domain lengkap API HTTPS | `https://api.domainanda.com` |
+| `GCP_PROJECT_ID`             | GCP Project ID                   | `my-gcp-project`                                      |
+| `GCE_INSTANCE`               | Nama VM Instance Compute Engine  | `forum-api-vm`                                        |
+| `GCE_ZONE`                   | Zone Compute Engine              | `asia-southeast2-a`                                   |
+| `GCE_DEPLOY_USER`            | Username SSH di VM               | `ubuntu` atau `ald`                                   |
+| `FORUM_API_HTTPS_URL`        | Domain lengkap API HTTPS         | `https://api.domainanda.com`                          |
 
 ---
 
@@ -339,6 +356,7 @@ Isi **Environment Variables**:
 ---
 
 ## 📋 Ringkasan Berkas Deployment
-* [`.github/workflows/cd.yml`](file:///.github/workflows/cd.yml) : Workflow CI/CD deployment otomatis ke GCP Compute Engine.
-* [`deploy/deploy-on-vm.sh`](file:///deploy/deploy-on-vm.sh) : Script eksekusi di VM untuk mengunduh kode terbaru, menjalankan migrasi database, dan merestart service.
-* [`deploy/forum-api.service`](file:///deploy/forum-api.service) : Systemd unit file untuk menjalankan Forum API di VM.
+
+- [`.github/workflows/cd.yml`](file:///.github/workflows/cd.yml) : Workflow CI/CD deployment otomatis ke GCP Compute Engine.
+- [`deploy/deploy-on-vm.sh`](file:///deploy/deploy-on-vm.sh) : Script eksekusi di VM untuk mengunduh kode terbaru, menjalankan migrasi database, dan merestart service.
+- [`deploy/forum-api.service`](file:///deploy/forum-api.service) : Systemd unit file untuk menjalankan Forum API di VM.
