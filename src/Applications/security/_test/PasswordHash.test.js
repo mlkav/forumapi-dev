@@ -6,7 +6,11 @@ describe('EncryptionHelper interface', () => {
     const encryptionHelper = new EncryptionHelper();
 
     // Action & Assert
-    await expect(encryptionHelper.hash('dummy_password')).rejects.toThrowError('PASSWORD_HASH.METHOD_NOT_IMPLEMENTED');
-    await expect(encryptionHelper.comparePassword('plain', 'encrypted')).rejects.toThrowError('PASSWORD_HASH.METHOD_NOT_IMPLEMENTED');
+    await expect(encryptionHelper.hash('dummy_password')).rejects.toThrowError(
+      'PASSWORD_HASH.METHOD_NOT_IMPLEMENTED',
+    );
+    await expect(
+      encryptionHelper.comparePassword('plain', 'encrypted'),
+    ).rejects.toThrowError('PASSWORD_HASH.METHOD_NOT_IMPLEMENTED');
   });
 });

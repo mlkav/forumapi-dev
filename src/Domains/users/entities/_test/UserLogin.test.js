@@ -8,7 +8,9 @@ describe('UserLogin entities', () => {
     };
 
     // Action & Assert
-    expect(() => new UserLogin(payload)).toThrowError('USER_LOGIN.NOT_CONTAIN_NEEDED_PROPERTY');
+    expect(() => new UserLogin(payload)).toThrowError(
+      'USER_LOGIN.NOT_CONTAIN_NEEDED_PROPERTY',
+    );
   });
 
   it('should throw error when payload not meet data type specification', () => {
@@ -19,7 +21,9 @@ describe('UserLogin entities', () => {
     };
 
     // Action & Assert
-    expect(() => new UserLogin(payload)).toThrowError('USER_LOGIN.NOT_MEET_DATA_TYPE_SPECIFICATION');
+    expect(() => new UserLogin(payload)).toThrowError(
+      'USER_LOGIN.NOT_MEET_DATA_TYPE_SPECIFICATION',
+    );
   });
 
   it('should create UserLogin entities correctly', () => {

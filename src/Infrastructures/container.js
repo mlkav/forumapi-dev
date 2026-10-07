@@ -112,8 +112,8 @@ container.register([
     parameter: {
       dependencies: [
         {
-          concrete: jwt
-        }
+          concrete: jwt,
+        },
       ],
     },
   },
@@ -198,7 +198,9 @@ container.register([
     Class: AddThreadUseCase,
     parameter: {
       injectType: 'destructuring',
-      dependencies: [{ name: 'threadRepository', internal: ThreadRepository.name }],
+      dependencies: [
+        { name: 'threadRepository', internal: ThreadRepository.name },
+      ],
     },
   },
   {

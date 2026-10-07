@@ -20,9 +20,13 @@ describe('JwtTokenManager', () => {
       const accessToken = await jwtTokenManager.createAccessToken(payload);
 
       // Assert
-      expect(mockJwtToken.sign).toBeCalledWith(payload, config.auth.accessTokenKey, {
-        expiresIn: config.auth.accessTokenAge,
-      });
+      expect(mockJwtToken.sign).toBeCalledWith(
+        payload,
+        config.auth.accessTokenKey,
+        {
+          expiresIn: config.auth.accessTokenAge,
+        },
+      );
       expect(accessToken).toEqual('mock_token');
     });
   });
@@ -42,7 +46,10 @@ describe('JwtTokenManager', () => {
       const refreshToken = await jwtTokenManager.createRefreshToken(payload);
 
       // Assert
-      expect(mockJwtToken.sign).toBeCalledWith(payload, config.auth.refreshTokenKey);
+      expect(mockJwtToken.sign).toBeCalledWith(
+        payload,
+        config.auth.refreshTokenKey,
+      );
       expect(refreshToken).toEqual('mock_token');
     });
   });
@@ -51,23 +58,27 @@ describe('JwtTokenManager', () => {
     it('should throw InvariantError when verification failed', async () => {
       // Arrange
       const jwtTokenManager = new JwtTokenManager(jwt);
-      const accessToken = await jwtTokenManager.createAccessToken({ username: 'dicoding' });
+      const accessToken = await jwtTokenManager.createAccessToken({
+        username: 'dicoding',
+      });
 
       // Action & Assert
-      await expect(jwtTokenManager.verifyRefreshToken(accessToken))
-        .rejects
-        .toThrow(InvariantError);
+      await expect(
+        jwtTokenManager.verifyRefreshToken(accessToken),
+      ).rejects.toThrow(InvariantError);
     });
 
     it('should not throw InvariantError when refresh token verified', async () => {
       // Arrange
       const jwtTokenManager = new JwtTokenManager(jwt);
-      const refreshToken = await jwtTokenManager.createRefreshToken({ username: 'dicoding' });
+      const refreshToken = await jwtTokenManager.createRefreshToken({
+        username: 'dicoding',
+      });
 
       // Action & Assert
-      await expect(jwtTokenManager.verifyRefreshToken(refreshToken))
-        .resolves
-        .not.toThrow(InvariantError);
+      await expect(
+        jwtTokenManager.verifyRefreshToken(refreshToken),
+      ).resolves.not.toThrow(InvariantError);
     });
   });
 
@@ -75,18 +86,20 @@ describe('JwtTokenManager', () => {
     it('should throw InvariantError when verification failed', async () => {
       const jwtTokenManager = new JwtTokenManager(jwt);
 
-      await expect(jwtTokenManager.verifyAccessToken('invalid-token'))
-        .rejects
-        .toThrow(InvariantError);
+      await expect(
+        jwtTokenManager.verifyAccessToken('invalid-token'),
+      ).rejects.toThrow(InvariantError);
     });
 
     it('should not throw InvariantError when access token is verified', async () => {
       const jwtTokenManager = new JwtTokenManager(jwt);
-      const accessToken = await jwtTokenManager.createAccessToken({ username: 'dicoding' });
+      const accessToken = await jwtTokenManager.createAccessToken({
+        username: 'dicoding',
+      });
 
-      await expect(jwtTokenManager.verifyAccessToken(accessToken))
-        .resolves
-        .toBeUndefined();
+      await expect(
+        jwtTokenManager.verifyAccessToken(accessToken),
+      ).resolves.toBeUndefined();
     });
   });
 
@@ -94,10 +107,13 @@ describe('JwtTokenManager', () => {
     it('should decode payload correctly', async () => {
       // Arrange
       const jwtTokenManager = new JwtTokenManager(jwt);
-      const accessToken = await jwtTokenManager.createAccessToken({ username: 'dicoding' });
+      const accessToken = await jwtTokenManager.createAccessToken({
+        username: 'dicoding',
+      });
 
       // Action
-      const { username: expectedUsername } = await jwtTokenManager.decodePayload(accessToken);
+      const { username: expectedUsername } =
+        await jwtTokenManager.decodePayload(accessToken);
 
       // Action & Assert
       expect(expectedUsername).toEqual('dicoding');

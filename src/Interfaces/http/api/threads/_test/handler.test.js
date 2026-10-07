@@ -13,7 +13,10 @@ describe('ThreadsHandler', () => {
     {
       method: 'postThreadHandler',
       useCase: AddThreadUseCase,
-      request: { body: { title: 'title', body: 'body' }, auth: { id: 'user-123' } },
+      request: {
+        body: { title: 'title', body: 'body' },
+        auth: { id: 'user-123' },
+      },
       result: { id: 'thread-123' },
       statusCode: 201,
       body: (result) => ({ status: 'success', data: { addedThread: result } }),
@@ -62,7 +65,11 @@ describe('ThreadsHandler', () => {
       method: 'deleteReplyHandler',
       useCase: DeleteReplyUseCase,
       request: {
-        params: { threadId: 'thread-123', commentId: 'comment-123', replyId: 'reply-123' },
+        params: {
+          threadId: 'thread-123',
+          commentId: 'comment-123',
+          replyId: 'reply-123',
+        },
         auth: { id: 'user-123' },
       },
       body: () => ({ status: 'success' }),
@@ -78,44 +85,51 @@ describe('ThreadsHandler', () => {
     },
   ];
 
-  it.each(handlerCases)('should handle $method successfully', async ({
-    method,
-    useCase,
-    request,
-    result,
-    statusCode,
-    body,
-  }) => {
-    const execute = vi.fn().mockResolvedValue(result);
-    const container = { getInstance: vi.fn().mockReturnValue({ execute }) };
-    const handler = new ThreadsHandler(container);
-    const response = {
-      status: vi.fn().mockReturnThis(),
-      json: vi.fn().mockReturnThis(),
-    };
-    const next = vi.fn();
+  it.each(handlerCases)(
+    'should handle $method successfully',
+    async ({ method, useCase, request, result, statusCode, body }) => {
+      const execute = vi.fn().mockResolvedValue(result);
+      const container = { getInstance: vi.fn().mockReturnValue({ execute }) };
+      const handler = new ThreadsHandler(container);
+      const response = {
+        status: vi.fn().mockReturnThis(),
+        json: vi.fn().mockReturnThis(),
+      };
+      const next = vi.fn();
 
-    await handler[method](request, response, next);
+      await handler[method](request, response, next);
 
-    expect(container.getInstance).toHaveBeenCalledWith(useCase.name);
-    if (statusCode) {
-      expect(response.status).toHaveBeenCalledWith(statusCode);
-    } else {
-      expect(response.status).not.toHaveBeenCalled();
-    }
-    expect(response.json).toHaveBeenCalledWith(body(result));
-    expect(next).not.toHaveBeenCalled();
-  });
+      expect(container.getInstance).toHaveBeenCalledWith(useCase.name);
+      if (statusCode) {
+        expect(response.status).toHaveBeenCalledWith(statusCode);
+      } else {
+        expect(response.status).not.toHaveBeenCalled();
+      }
+      expect(response.json).toHaveBeenCalledWith(body(result));
+      expect(next).not.toHaveBeenCalled();
+    },
+  );
 
-  it.each(handlerCases)('should forward errors from $method', async ({ method, useCase }) => {
-    const error = new Error('use case failed');
-    const container = { getInstance: vi.fn().mockReturnValue({ execute: vi.fn().mockRejectedValue(error) }) };
-    const handler = new ThreadsHandler(container);
-    const next = vi.fn();
+  it.each(handlerCases)(
+    'should forward errors from $method',
+    async ({ method, useCase }) => {
+      const error = new Error('use case failed');
+      const container = {
+        getInstance: vi
+          .fn()
+          .mockReturnValue({ execute: vi.fn().mockRejectedValue(error) }),
+      };
+      const handler = new ThreadsHandler(container);
+      const next = vi.fn();
 
-    await handler[method]({ body: {}, params: {}, auth: { id: 'user-123' } }, {}, next);
+      await handler[method](
+        { body: {}, params: {}, auth: { id: 'user-123' } },
+        {},
+        next,
+      );
 
-    expect(container.getInstance).toHaveBeenCalledWith(useCase.name);
-    expect(next).toHaveBeenCalledWith(error);
-  });
+      expect(container.getInstance).toHaveBeenCalledWith(useCase.name);
+      expect(next).toHaveBeenCalledWith(error);
+    },
+  );
 });

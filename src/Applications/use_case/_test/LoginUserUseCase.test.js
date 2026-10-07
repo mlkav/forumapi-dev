@@ -23,17 +23,27 @@ describe('GetAuthenticationUseCase', () => {
     const mockPasswordHash = new PasswordHash();
 
     // Mocking
-    mockUserRepository.getPasswordByUsername = vi.fn()
+    mockUserRepository.getPasswordByUsername = vi
+      .fn()
       .mockImplementation(() => Promise.resolve('encrypted_password'));
-    mockPasswordHash.comparePassword = vi.fn()
+    mockPasswordHash.comparePassword = vi
+      .fn()
       .mockImplementation(() => Promise.resolve());
-    mockAuthenticationTokenManager.createAccessToken = vi.fn()
-      .mockImplementation(() => Promise.resolve(mockedAuthentication.accessToken));
-    mockAuthenticationTokenManager.createRefreshToken = vi.fn()
-      .mockImplementation(() => Promise.resolve(mockedAuthentication.refreshToken));
-    mockUserRepository.getIdByUsername = vi.fn()
+    mockAuthenticationTokenManager.createAccessToken = vi
+      .fn()
+      .mockImplementation(() =>
+        Promise.resolve(mockedAuthentication.accessToken),
+      );
+    mockAuthenticationTokenManager.createRefreshToken = vi
+      .fn()
+      .mockImplementation(() =>
+        Promise.resolve(mockedAuthentication.refreshToken),
+      );
+    mockUserRepository.getIdByUsername = vi
+      .fn()
       .mockImplementation(() => Promise.resolve('user-123'));
-    mockAuthenticationRepository.addToken = vi.fn()
+    mockAuthenticationRepository.addToken = vi
+      .fn()
       .mockImplementation(() => Promise.resolve());
 
     // create use case instance
@@ -48,21 +58,28 @@ describe('GetAuthenticationUseCase', () => {
     const actualAuthentication = await loginUserUseCase.execute(useCasePayload);
 
     // Assert
-    expect(actualAuthentication).toEqual(new NewAuth({
-      accessToken: 'access_token',
-      refreshToken: 'refresh_token',
-    }));
-    expect(mockUserRepository.getPasswordByUsername)
-      .toBeCalledWith('dicoding');
-    expect(mockPasswordHash.comparePassword)
-      .toBeCalledWith('secret', 'encrypted_password');
-    expect(mockUserRepository.getIdByUsername)
-      .toBeCalledWith('dicoding');
-    expect(mockAuthenticationTokenManager.createAccessToken)
-      .toBeCalledWith({ username: 'dicoding', id: 'user-123' });
-    expect(mockAuthenticationTokenManager.createRefreshToken)
-      .toBeCalledWith({ username: 'dicoding', id: 'user-123' });
-    expect(mockAuthenticationRepository.addToken)
-      .toBeCalledWith(mockedAuthentication.refreshToken);
+    expect(actualAuthentication).toEqual(
+      new NewAuth({
+        accessToken: 'access_token',
+        refreshToken: 'refresh_token',
+      }),
+    );
+    expect(mockUserRepository.getPasswordByUsername).toBeCalledWith('dicoding');
+    expect(mockPasswordHash.comparePassword).toBeCalledWith(
+      'secret',
+      'encrypted_password',
+    );
+    expect(mockUserRepository.getIdByUsername).toBeCalledWith('dicoding');
+    expect(mockAuthenticationTokenManager.createAccessToken).toBeCalledWith({
+      username: 'dicoding',
+      id: 'user-123',
+    });
+    expect(mockAuthenticationTokenManager.createRefreshToken).toBeCalledWith({
+      username: 'dicoding',
+      id: 'user-123',
+    });
+    expect(mockAuthenticationRepository.addToken).toBeCalledWith(
+      mockedAuthentication.refreshToken,
+    );
   });
 });

@@ -19,13 +19,19 @@ const authenticate = (container) => async (req, res, next) => {
     await tokenManager.verifyAccessToken(token);
   } catch (error) {
     if (error instanceof InvariantError) {
-      return next(new AuthenticationError('Invalid authentication credentials'));
+      return next(
+        new AuthenticationError('Invalid authentication credentials'),
+      );
     }
     return next(error);
   }
 
   const payload = await tokenManager.decodePayload(token);
-  if (!payload || typeof payload !== 'object' || typeof payload.id !== 'string') {
+  if (
+    !payload ||
+    typeof payload !== 'object' ||
+    typeof payload.id !== 'string'
+  ) {
     return next(new AuthenticationError('Invalid authentication credentials'));
   }
   req.auth = { id: payload.id };

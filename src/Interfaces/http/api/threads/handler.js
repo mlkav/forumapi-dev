@@ -55,7 +55,11 @@ class ThreadsHandler {
   async deleteCommentHandler(req, res, next) {
     try {
       const useCase = this._container.getInstance(DeleteCommentUseCase.name);
-      await useCase.execute(req.params.threadId, req.params.commentId, req.auth.id);
+      await useCase.execute(
+        req.params.threadId,
+        req.params.commentId,
+        req.auth.id,
+      );
       res.json({ status: 'success' });
     } catch (error) {
       next(error);
@@ -94,8 +98,14 @@ class ThreadsHandler {
 
   async toggleCommentLikeHandler(req, res, next) {
     try {
-      const useCase = this._container.getInstance(ToggleCommentLikeUseCase.name);
-      await useCase.execute(req.params.threadId, req.params.commentId, req.auth.id);
+      const useCase = this._container.getInstance(
+        ToggleCommentLikeUseCase.name,
+      );
+      await useCase.execute(
+        req.params.threadId,
+        req.params.commentId,
+        req.auth.id,
+      );
       res.json({ status: 'success' });
     } catch (error) {
       next(error);

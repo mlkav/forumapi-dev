@@ -4,8 +4,9 @@ describe('CommentLikeRepository interface', () => {
   it('should throw an error when invoking abstract behavior', async () => {
     const repository = new CommentLikeRepository();
 
-    await expect(repository.withCommentLock('', '', () => undefined))
-      .rejects.toThrowError('COMMENT_LIKE_REPOSITORY.METHOD_NOT_IMPLEMENTED');
+    await expect(
+      repository.withCommentLock('', '', () => undefined),
+    ).rejects.toThrowError('COMMENT_LIKE_REPOSITORY.METHOD_NOT_IMPLEMENTED');
     await expect(repository.getLike('', '')).rejects.toThrowError(
       'COMMENT_LIKE_REPOSITORY.METHOD_NOT_IMPLEMENTED',
     );

@@ -58,9 +58,15 @@ describe('GetThreadDetailUseCase', () => {
     const mockCommentRepository = new CommentRepository();
     const mockReplyRepository = new ReplyRepository();
 
-    mockThreadRepository.getThreadById = vi.fn().mockImplementation(() => Promise.resolve(mockThread));
-    mockCommentRepository.getCommentsByThreadId = vi.fn().mockImplementation(() => Promise.resolve(mockComments));
-    mockReplyRepository.getRepliesByThreadId = vi.fn().mockImplementation(() => Promise.resolve(mockReplies));
+    mockThreadRepository.getThreadById = vi
+      .fn()
+      .mockImplementation(() => Promise.resolve(mockThread));
+    mockCommentRepository.getCommentsByThreadId = vi
+      .fn()
+      .mockImplementation(() => Promise.resolve(mockComments));
+    mockReplyRepository.getRepliesByThreadId = vi
+      .fn()
+      .mockImplementation(() => Promise.resolve(mockReplies));
 
     const getThreadDetailUseCase = new GetThreadDetailUseCase({
       threadRepository: mockThreadRepository,
@@ -111,7 +117,11 @@ describe('GetThreadDetailUseCase', () => {
       ],
     });
     expect(mockThreadRepository.getThreadById).toHaveBeenCalledWith(threadId);
-    expect(mockCommentRepository.getCommentsByThreadId).toHaveBeenCalledWith(threadId);
-    expect(mockReplyRepository.getRepliesByThreadId).toHaveBeenCalledWith(threadId);
+    expect(mockCommentRepository.getCommentsByThreadId).toHaveBeenCalledWith(
+      threadId,
+    );
+    expect(mockReplyRepository.getRepliesByThreadId).toHaveBeenCalledWith(
+      threadId,
+    );
   });
 });

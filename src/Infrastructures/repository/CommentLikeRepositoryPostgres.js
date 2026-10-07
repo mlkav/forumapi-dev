@@ -23,21 +23,12 @@ class CommentLikeRepositoryPostgres extends CommentLikeRepository {
       }
 
       const transactionRepository = {
-        getLike: (userId, selectedCommentId) => this._getLike(
-          client,
-          userId,
-          selectedCommentId,
-        ),
-        addLike: (userId, selectedCommentId) => this._addLike(
-          client,
-          userId,
-          selectedCommentId,
-        ),
-        removeLike: (userId, selectedCommentId) => this._removeLike(
-          client,
-          userId,
-          selectedCommentId,
-        ),
+        getLike: (userId, selectedCommentId) =>
+          this._getLike(client, userId, selectedCommentId),
+        addLike: (userId, selectedCommentId) =>
+          this._addLike(client, userId, selectedCommentId),
+        removeLike: (userId, selectedCommentId) =>
+          this._removeLike(client, userId, selectedCommentId),
       };
       const resultFromCallback = await callback(transactionRepository);
       await client.query('COMMIT');

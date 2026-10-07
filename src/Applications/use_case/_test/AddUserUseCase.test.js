@@ -28,11 +28,14 @@ describe('AddUserUseCase', () => {
     const mockPasswordHash = new PasswordHash();
 
     /** mocking needed function */
-    mockUserRepository.verifyAvailableUsername = vi.fn()
+    mockUserRepository.verifyAvailableUsername = vi
+      .fn()
       .mockImplementation(() => Promise.resolve());
-    mockPasswordHash.hash = vi.fn()
+    mockPasswordHash.hash = vi
+      .fn()
       .mockImplementation(() => Promise.resolve('encrypted_password'));
-    mockUserRepository.addUser = vi.fn()
+    mockUserRepository.addUser = vi
+      .fn()
       .mockImplementation(() => Promise.resolve(mockRegisteredUser));
 
     /** creating use case instance */
@@ -45,18 +48,24 @@ describe('AddUserUseCase', () => {
     const registeredUser = await getUserUseCase.execute(useCasePayload);
 
     // Assert
-    expect(registeredUser).toStrictEqual(new RegisteredUser({
-      id: 'user-123',
-      username: useCasePayload.username,
-      fullname: useCasePayload.fullname,
-    }));
+    expect(registeredUser).toStrictEqual(
+      new RegisteredUser({
+        id: 'user-123',
+        username: useCasePayload.username,
+        fullname: useCasePayload.fullname,
+      }),
+    );
 
-    expect(mockUserRepository.verifyAvailableUsername).toBeCalledWith(useCasePayload.username);
+    expect(mockUserRepository.verifyAvailableUsername).toBeCalledWith(
+      useCasePayload.username,
+    );
     expect(mockPasswordHash.hash).toBeCalledWith(useCasePayload.password);
-    expect(mockUserRepository.addUser).toBeCalledWith(new RegisterUser({
-      username: useCasePayload.username,
-      password: 'encrypted_password',
-      fullname: useCasePayload.fullname,
-    }));
+    expect(mockUserRepository.addUser).toBeCalledWith(
+      new RegisterUser({
+        username: useCasePayload.username,
+        password: 'encrypted_password',
+        fullname: useCasePayload.fullname,
+      }),
+    );
   });
 });

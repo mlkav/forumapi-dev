@@ -7,7 +7,8 @@ class GetThreadDetailUseCase {
 
   async execute(threadId) {
     const thread = await this._threadRepository.getThreadById(threadId);
-    const comments = await this._commentRepository.getCommentsByThreadId(threadId);
+    const comments =
+      await this._commentRepository.getCommentsByThreadId(threadId);
     const replies = await this._replyRepository.getRepliesByThreadId(threadId);
 
     const formattedComments = comments.map((comment) => {
@@ -15,7 +16,9 @@ class GetThreadDetailUseCase {
         .filter((reply) => reply.comment_id === comment.id)
         .map((reply) => ({
           id: reply.id,
-          content: reply.is_delete ? '**balasan telah dihapus**' : reply.content,
+          content: reply.is_delete
+            ? '**balasan telah dihapus**'
+            : reply.content,
           date: reply.date,
           username: reply.username,
         }));
@@ -24,7 +27,9 @@ class GetThreadDetailUseCase {
         id: comment.id,
         username: comment.username,
         date: comment.date,
-        content: comment.is_delete ? '**komentar telah dihapus**' : comment.content,
+        content: comment.is_delete
+          ? '**komentar telah dihapus**'
+          : comment.content,
         replies: commentReplies,
         likeCount: comment.like_count,
       };

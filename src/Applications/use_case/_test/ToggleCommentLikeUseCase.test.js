@@ -15,7 +15,9 @@ describe('ToggleCommentLikeUseCase', () => {
       removeLike: vi.fn().mockResolvedValue(undefined),
     };
     const commentLikeRepository = {
-      withCommentLock: vi.fn((_commentId, _threadId, operation) => operation(transactionRepository)),
+      withCommentLock: vi.fn((_commentId, _threadId, operation) =>
+        operation(transactionRepository),
+      ),
     };
     const useCase = new ToggleCommentLikeUseCase({
       threadRepository,
@@ -41,19 +43,30 @@ describe('ToggleCommentLikeUseCase', () => {
       transactionRepository,
     } = createUseCase();
 
-    await expect(useCase.execute('thread-123', 'comment-123', 'user-123'))
-      .resolves.toBeUndefined();
+    await expect(
+      useCase.execute('thread-123', 'comment-123', 'user-123'),
+    ).resolves.toBeUndefined();
 
-    expect(threadRepository.checkAvailabilityThread).toHaveBeenCalledWith('thread-123');
-    expect(commentRepository.checkAvailabilityComment)
-      .toHaveBeenCalledWith('comment-123', 'thread-123');
+    expect(threadRepository.checkAvailabilityThread).toHaveBeenCalledWith(
+      'thread-123',
+    );
+    expect(commentRepository.checkAvailabilityComment).toHaveBeenCalledWith(
+      'comment-123',
+      'thread-123',
+    );
     expect(commentLikeRepository.withCommentLock).toHaveBeenCalledWith(
       'comment-123',
       'thread-123',
       expect.any(Function),
     );
-    expect(transactionRepository.getLike).toHaveBeenCalledWith('user-123', 'comment-123');
-    expect(transactionRepository.addLike).toHaveBeenCalledWith('user-123', 'comment-123');
+    expect(transactionRepository.getLike).toHaveBeenCalledWith(
+      'user-123',
+      'comment-123',
+    );
+    expect(transactionRepository.addLike).toHaveBeenCalledWith(
+      'user-123',
+      'comment-123',
+    );
     expect(transactionRepository.removeLike).not.toHaveBeenCalled();
   });
 
@@ -64,7 +77,10 @@ describe('ToggleCommentLikeUseCase', () => {
 
     await useCase.execute('thread-123', 'comment-123', 'user-123');
 
-    expect(transactionRepository.removeLike).toHaveBeenCalledWith('user-123', 'comment-123');
+    expect(transactionRepository.removeLike).toHaveBeenCalledWith(
+      'user-123',
+      'comment-123',
+    );
     expect(transactionRepository.addLike).not.toHaveBeenCalled();
   });
 
@@ -75,27 +91,33 @@ describe('ToggleCommentLikeUseCase', () => {
   ])('should propagate %s failures', async (_label, dependency) => {
     const error = new Error(`${dependency} failed`);
     const dependencies = createUseCase();
-    const repository = dependency === 'checkAvailabilityThread'
-      ? dependencies.threadRepository
-      : dependency === 'checkAvailabilityComment'
-        ? dependencies.commentRepository
-        : dependencies.commentLikeRepository;
+    const repository =
+      dependency === 'checkAvailabilityThread'
+        ? dependencies.threadRepository
+        : dependency === 'checkAvailabilityComment'
+          ? dependencies.commentRepository
+          : dependencies.commentLikeRepository;
     repository[dependency].mockRejectedValue(error);
 
-    await expect(dependencies.useCase.execute('thread-123', 'comment-123', 'user-123'))
-      .rejects.toBe(error);
+    await expect(
+      dependencies.useCase.execute('thread-123', 'comment-123', 'user-123'),
+    ).rejects.toBe(error);
   });
 
   it.each([
     ['getLike', null, 'getLike'],
     ['addLike', null, 'addLike'],
     ['getLike', { user_id: 'user-123' }, 'removeLike'],
-  ])('should propagate transaction %s failures', async (_label, existingLike, method) => {
-    const error = new Error(`${method} failed`);
-    const dependencies = createUseCase({ existingLike });
-    dependencies.transactionRepository[method].mockRejectedValue(error);
+  ])(
+    'should propagate transaction %s failures',
+    async (_label, existingLike, method) => {
+      const error = new Error(`${method} failed`);
+      const dependencies = createUseCase({ existingLike });
+      dependencies.transactionRepository[method].mockRejectedValue(error);
 
-    await expect(dependencies.useCase.execute('thread-123', 'comment-123', 'user-123'))
-      .rejects.toBe(error);
-  });
+      await expect(
+        dependencies.useCase.execute('thread-123', 'comment-123', 'user-123'),
+      ).rejects.toBe(error);
+    },
+  );
 });

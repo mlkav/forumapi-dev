@@ -30,7 +30,8 @@ describe('configuration outside the test environment', () => {
   it('should load the default environment file outside tests', async () => {
     vi.stubEnv('NODE_ENV', 'development');
     try {
-      const { default: config } = await import('../config.js?development-coverage');
+      const { default: config } =
+        await import('../config.js?development-coverage');
 
       expect(config.app.host).toBe('localhost');
       expect(config.app.debug).toEqual({ request: ['error'] });
@@ -42,7 +43,8 @@ describe('configuration outside the test environment', () => {
   it('should use production host settings', async () => {
     vi.stubEnv('NODE_ENV', 'production');
     try {
-      const { default: config } = await import('../config.js?production-coverage');
+      const { default: config } =
+        await import('../config.js?production-coverage');
 
       expect(config.app.host).toBe('0.0.0.0');
       expect(config.app.debug).toEqual({});
@@ -56,7 +58,8 @@ describe('configuration outside the test environment', () => {
     vi.stubEnv('TEST_PGDATABASE', 'forumapi_test');
     vi.stubEnv('ACCESS_TOKEN_AGE', '');
     try {
-      const { default: config } = await import('../config.js?test-database-coverage');
+      const { default: config } =
+        await import('../config.js?test-database-coverage');
 
       expect(config.database.database).toBe('forumapi_test');
       expect(config.database.database).not.toBe(process.env.PGDATABASE);
@@ -70,8 +73,11 @@ describe('configuration outside the test environment', () => {
     vi.stubEnv('NODE_ENV', 'test');
     vi.stubEnv('TEST_PGDATABASE', 'forumapi');
     try {
-      await expect(import('../config.js?unsafe-test-database-coverage'))
-        .rejects.toThrow('TEST_PGDATABASE must use a database name ending in "_test"');
+      await expect(
+        import('../config.js?unsafe-test-database-coverage'),
+      ).rejects.toThrow(
+        'TEST_PGDATABASE must use a database name ending in "_test"',
+      );
     } finally {
       vi.unstubAllEnvs();
     }
@@ -81,7 +87,8 @@ describe('configuration outside the test environment', () => {
     vi.stubEnv('NODE_ENV', 'production');
     vi.stubEnv('ACCESS_TOKEN_AGE', '15m');
     try {
-      const { default: config } = await import('../config.js?configured-token-age-coverage');
+      const { default: config } =
+        await import('../config.js?configured-token-age-coverage');
 
       expect(config.auth.accessTokenAge).toBe('15m');
     } finally {

@@ -7,8 +7,16 @@ const createThreadsRouter = (handler, container) => {
 
   router.post('/', requireAuthentication, handler.postThreadHandler);
   router.get('/:threadId', handler.getThreadHandler);
-  router.post('/:threadId/comments', requireAuthentication, handler.postCommentHandler);
-  router.delete('/:threadId/comments/:commentId', requireAuthentication, handler.deleteCommentHandler);
+  router.post(
+    '/:threadId/comments',
+    requireAuthentication,
+    handler.postCommentHandler,
+  );
+  router.delete(
+    '/:threadId/comments/:commentId',
+    requireAuthentication,
+    handler.deleteCommentHandler,
+  );
   router.put(
     '/:threadId/comments/:commentId/likes',
     requireAuthentication,
