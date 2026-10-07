@@ -1,95 +1,35 @@
 name: Continuous Deployment (GCP)
 
 on:
-  push:
-    branches: [main, master]
+  workflow_run:
+    workflows:
+      - Continuous Integration
+    types:
+      - completed
+    branches:
+      - main
+      - master
 
 permissions:
   contents: read
   id-token: write
 
 jobs:
-  verify:
-    name: Lint, Test & Coverage Check
-    runs-on: ubuntu-24.04
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_DB: forumapi_test
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U postgres -d forumapi_test"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-    env:
-      NODE_ENV: test
-      TEST_PGDATABASE: forumapi_test
-      PGHOST: localhost
-      PGPORT: 5432
-      PGUSER: postgres
-      PGPASSWORD: postgres
-      ACCESS_TOKEN_AGE: 1h
-    steps:
-      - name: Check out source
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Create isolated test database configuration
-        run: |
-          mkdir -p config/database
-          node --input-type=module <<'NODE'
-          import { writeFileSync } from 'node:fs';
-
-          const database = {
-            user: process.env.PGUSER,
-            password: process.env.PGPASSWORD,
-            host: process.env.PGHOST,
-            port: Number(process.env.PGPORT),
-            database: process.env.TEST_PGDATABASE,
-          };
-
-          writeFileSync(
-            'config/database/test.json',
-            `${JSON.stringify(database, null, 2)}\n`,
-            { mode: 0o600 },
-          );
-          NODE
-
-      - name: Generate ephemeral test signing keys
-        run: |
-          printf 'ACCESS_TOKEN_KEY=%s\n' "$(openssl rand -hex 32)" >> "$GITHUB_ENV"
-          printf 'REFRESH_TOKEN_KEY=%s\n' "$(openssl rand -hex 32)" >> "$GITHUB_ENV"
-
-      - name: Apply database migrations
-        run: npm run migrate:test -- up
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Run tests and coverage check
-        run: npm run test:coverage
-
   deploy:
     name: Deploy to GCP Compute Engine
-    needs: verify
+    if: >
+      ${{ github.event.workflow_run.conclusion == 'success' &&
+          (github.event.workflow_run.head_branch == 'main' ||
+           github.event.workflow_run.head_branch == 'master') }}
     runs-on: ubuntu-24.04
+
     environment: production
+
     steps:
       - name: Check out source
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
 
       - name: Authenticate to Google Cloud (Workload Identity Federation)
         uses: google-github-actions/auth@v2

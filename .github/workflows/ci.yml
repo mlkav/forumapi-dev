@@ -3,8 +3,19 @@ name: Continuous Integration
 on:
   pull_request:
     branches: [main, master]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.gitignore'
+      - 'LICENSE'
+
   push:
     branches: [main, master]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.gitignore'
+      - 'LICENSE'
 
 permissions:
   contents: read
@@ -13,6 +24,7 @@ jobs:
   verify:
     name: Lint, database tests, and coverage
     runs-on: ubuntu-24.04
+
     services:
       postgres:
         image: postgres:16
@@ -27,6 +39,7 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+
     env:
       NODE_ENV: test
       TEST_PGDATABASE: forumapi_test
@@ -35,6 +48,7 @@ jobs:
       PGUSER: postgres
       PGPASSWORD: postgres
       ACCESS_TOKEN_AGE: 1h
+
     steps:
       - name: Check out source
         uses: actions/checkout@v4
@@ -54,6 +68,7 @@ jobs:
       - name: Create isolated test database configuration
         run: |
           mkdir -p config/database
+
           node --input-type=module <<'NODE'
           import { writeFileSync } from 'node:fs';
 
