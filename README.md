@@ -38,19 +38,18 @@ npm run format:check
 
 ## Endpoints
 
-| Method | Path | Description |
-| --- | --- | --- |
-| `GET` | `/health` | Health check |
-| `POST` | `/users` | Register a user |
-| `POST`, `PUT`, `DELETE` | `/authentications` | Log in, refresh a token, and log out |
-| `POST` | `/threads` | Create a thread (authentication required) |
-| `GET` | `/threads/{threadId}` | Get thread details, comments, replies, and like counts |
-| `POST` | `/threads/{threadId}/comments` | Add a comment (authentication required) |
-| `DELETE` | `/threads/{threadId}/comments/{commentId}` | Delete the user's own comment |
-| `PUT` | `/threads/{threadId}/comments/{commentId}/likes` | Toggle a like (authentication required) |
-| `POST` | `/threads/{threadId}/comments/{commentId}/replies` | Add a reply (authentication required) |
-| `DELETE` | `/threads/{threadId}/comments/{commentId}/replies/{replyId}` | Delete the user's own reply |
-
+| Method                  | Path                                                         | Description                                            |
+| ----------------------- | ------------------------------------------------------------ | ------------------------------------------------------ |
+| `GET`                   | `/health`                                                    | Health check                                           |
+| `POST`                  | `/users`                                                     | Register a user                                        |
+| `POST`, `PUT`, `DELETE` | `/authentications`                                           | Log in, refresh a token, and log out                   |
+| `POST`                  | `/threads`                                                   | Create a thread (authentication required)              |
+| `GET`                   | `/threads/{threadId}`                                        | Get thread details, comments, replies, and like counts |
+| `POST`                  | `/threads/{threadId}/comments`                               | Add a comment (authentication required)                |
+| `DELETE`                | `/threads/{threadId}/comments/{commentId}`                   | Delete the user's own comment                          |
+| `PUT`                   | `/threads/{threadId}/comments/{commentId}/likes`             | Toggle a like (authentication required)                |
+| `POST`                  | `/threads/{threadId}/comments/{commentId}/replies`           | Add a reply (authentication required)                  |
+| `DELETE`                | `/threads/{threadId}/comments/{commentId}/replies/{replyId}` | Delete the user's own reply                            |
 
 ## Deploy to GCP
 
@@ -59,12 +58,14 @@ The deployment uses Compute Engine with Ubuntu, Cloud SQL for PostgreSQL, Cloud 
 ### Set up the project and VM
 
 1. Set `PROJECT_ID`, `GITHUB_REPO`, `REGION`, and `ZONE` near the top of [`setup-gcp.sh`](./setup-gcp.sh). The script uses these hard-coded values to create GCP resources that may incur charges. Run it with an account that can enable APIs, create Cloud SQL instances and VMs, and manage IAM.
-    > This file is not included to avoid plagiarism.
+
+   > This file is not included to avoid plagiarism.
 
    ```bash
    gcloud auth login
    bash ./setup-gcp.sh
    ```
+
 2. Register the VM's public IP to obtain a Dicoding domain. Replace the `IP Public VM` with This filethe VM's IP, then run this command from a computer with `curl`:
 
    ```bash
@@ -97,13 +98,13 @@ sudo /opt/forum-api/deploy/deploy-on-vm.sh
 
 The CI workflow runs lint, dependency auditing, migrations, tests, and coverage against a temporary PostgreSQL database. The CD workflow runs the same checks before deployment, then performs an HTTPS health check.
 
-
 ## Output:
-   ![vm](./images/forumapi-vm.png)
-   ![iam](./images/forumapi-iam.png)
-   ![db-instance](./images/forum-db-instance.png)
-   ![forum-api.service](./images/forum-api.service.png)
-   ![cloud-sql-proxy.service](./images/cloud-sql-proxy.service.png)
-   ![forumapi-postman](./images/forumapi-postman.png)
-   ![pr-failed](./images/pr-failed.png)
-   ![pr-success](./images/pr-success.png)
+
+![vm](./images/forumapi-vm.png)
+![iam](./images/forumapi-iam.png)
+![db-instance](./images/forum-db-instance.png)
+![forum-api.service](./images/forum-api.service.png)
+![cloud-sql-proxy.service](./images/cloud-sql-proxy.service.png)
+![forumapi-postman](./images/forumapi-postman.png)
+![pr-failed](./images/pr-failed.png)
+![pr-success](./images/pr-success.png)
