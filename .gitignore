@@ -2,7 +2,7 @@ node_modules
 # package-lock.json
 .idea
 .env.*
-.vscode*
+.vscode/
 !.env.example
 config/database/test.json
 config/database/production.json
