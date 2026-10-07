@@ -1,5 +1,3 @@
-
-
 export const up = (pgm) => {
   pgm.createTable('authentications', {
     token: {
