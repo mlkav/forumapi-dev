@@ -6,6 +6,7 @@ on:
     paths-ignore:
       - '**.md'
       - 'docs/**'
+      - 'images/**'
       - 'script/**'
       - '.gitignore'
       - '.png'
@@ -16,6 +17,7 @@ on:
     paths-ignore:
       - '**.md'
       - 'docs/**'
+      - 'images/**'
       - 'script/**'
       - '.gitignore'
       - '.png'
