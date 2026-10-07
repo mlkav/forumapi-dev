@@ -2,7 +2,7 @@
 set -e
 
 # ==============================================================================
-# KONFIGURASI PERSISI DARI DOKUMEN & USER INPUT
+# KONFIGURASI
 # ==============================================================================
 export PROJECT_ID="rnlkav-forumapi"
 export GITHUB_REPO="mlkav/forumapi-dev"
@@ -16,7 +16,7 @@ export DB_INSTANCE_NAME="forum-db-instance"
 export DB_NAME="forumapi"
 export DB_USER="forum_user"
 
-# Password acak yang aman untuk Root & Database User
+# Password
 export DB_ROOT_PASSWORD=$(openssl rand -hex 16)
 export DB_USER_PASSWORD=$(openssl rand -hex 16)
 
@@ -85,8 +85,8 @@ VM_SA_EMAIL="${VM_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
 if ! gcloud iam service-accounts describe "$VM_SA_EMAIL" &>/dev/null; then
   gcloud iam service-accounts create "$VM_SA_NAME" \
     --display-name="Forum VM Service Account"
-  echo "Menunggu propagasi IAM Service Account (5 detik)..."
-  sleep 20
+  echo "Menunggu propagasi IAM Service Account (15 detik)..."
+  sleep 15
 fi
 
 gcloud projects add-iam-policy-binding "$PROJECT_ID" \
@@ -173,10 +173,10 @@ echo "======================================================================"
 echo " PROSES PERSIAPAN GCP SELESAI DENGAN SUKSES!"
 echo "======================================================================"
 echo ""
-echo "👉 Buka SSH ke VM Anda dengan menjalankan perintah ini:"
+echo "==> Buka SSH ke VM dengan menjalankan perintah ini:"
 echo "   gcloud compute ssh $VM_NAME --zone=$ZONE"
 echo ""
-echo "👉 Setelah masuk ke dalam VM, salin dan jalankan blok perintah berikut:"
+echo "==> Setelah masuk ke dalam VM, salin dan jalankan blok perintah berikut:"
 echo "----------------------------------------------------------------------"
 cat << EOF
 sudo apt update && sudo apt upgrade -y
@@ -256,5 +256,5 @@ echo "  GCP_PROJECT_ID             : $PROJECT_ID"
 echo "  GCE_INSTANCE               : $VM_NAME"
 echo "  GCE_ZONE                   : $ZONE"
 echo "  GCE_DEPLOY_USER            : $VM_USER"
-echo "  FORUM_API_HTTPS_URL        : https://api.domainanda.com"
+echo "  FORUM_API_HTTPS_URL        : "
 echo "======================================================================"
