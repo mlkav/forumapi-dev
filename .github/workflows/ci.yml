@@ -6,7 +6,9 @@ on:
     paths-ignore:
       - '**.md'
       - 'docs/**'
+      - 'script/**'
       - '.gitignore'
+      - '.png'
       - 'LICENSE'
 
   push:
@@ -14,7 +16,9 @@ on:
     paths-ignore:
       - '**.md'
       - 'docs/**'
+      - 'script/**'
       - '.gitignore'
+      - '.png'
       - 'LICENSE'
 
 permissions:
