@@ -10,3 +10,6 @@ coverage
 *.key
 service-account*.json
 .env
+setup-gcp.sh
+instruksi.md
+dcp.md
