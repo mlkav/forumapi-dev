@@ -4,7 +4,6 @@ import AddCommentUseCase from '../../../../Applications/use_case/AddCommentUseCa
 import DeleteCommentUseCase from '../../../../Applications/use_case/DeleteCommentUseCase.js';
 import AddReplyUseCase from '../../../../Applications/use_case/AddReplyUseCase.js';
 import DeleteReplyUseCase from '../../../../Applications/use_case/DeleteReplyUseCase.js';
-import ToggleCommentLikeUseCase from '../../../../Applications/use_case/ToggleCommentLikeUseCase.js';
 
 class ThreadsHandler {
   constructor(container) {
@@ -15,7 +14,6 @@ class ThreadsHandler {
     this.deleteCommentHandler = this.deleteCommentHandler.bind(this);
     this.postReplyHandler = this.postReplyHandler.bind(this);
     this.deleteReplyHandler = this.deleteReplyHandler.bind(this);
-    this.toggleCommentLikeHandler = this.toggleCommentLikeHandler.bind(this);
   }
 
   async postThreadHandler(req, res, next) {
@@ -55,11 +53,7 @@ class ThreadsHandler {
   async deleteCommentHandler(req, res, next) {
     try {
       const useCase = this._container.getInstance(DeleteCommentUseCase.name);
-      await useCase.execute(
-        req.params.threadId,
-        req.params.commentId,
-        req.auth.id,
-      );
+      await useCase.execute(req.params.threadId, req.params.commentId, req.auth.id);
       res.json({ status: 'success' });
     } catch (error) {
       next(error);
@@ -88,22 +82,6 @@ class ThreadsHandler {
         req.params.threadId,
         req.params.commentId,
         req.params.replyId,
-        req.auth.id,
-      );
-      res.json({ status: 'success' });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  async toggleCommentLikeHandler(req, res, next) {
-    try {
-      const useCase = this._container.getInstance(
-        ToggleCommentLikeUseCase.name,
-      );
-      await useCase.execute(
-        req.params.threadId,
-        req.params.commentId,
         req.auth.id,
       );
       res.json({ status: 'success' });

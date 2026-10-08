@@ -8,18 +8,13 @@ class AuthenticationsHandler {
 
     this.postAuthenticationHandler = this.postAuthenticationHandler.bind(this);
     this.putAuthenticationHandler = this.putAuthenticationHandler.bind(this);
-    this.deleteAuthenticationHandler =
-      this.deleteAuthenticationHandler.bind(this);
+    this.deleteAuthenticationHandler = this.deleteAuthenticationHandler.bind(this);
   }
 
   async postAuthenticationHandler(req, res, next) {
     try {
-      const loginUserUseCase = this._container.getInstance(
-        LoginUserUseCase.name,
-      );
-      const { accessToken, refreshToken } = await loginUserUseCase.execute(
-        req.body,
-      );
+      const loginUserUseCase = this._container.getInstance(LoginUserUseCase.name);
+      const { accessToken, refreshToken } = await loginUserUseCase.execute(req.body);
 
       res.status(201).json({
         status: 'success',
@@ -35,9 +30,8 @@ class AuthenticationsHandler {
 
   async putAuthenticationHandler(req, res, next) {
     try {
-      const refreshAuthenticationUseCase = this._container.getInstance(
-        RefreshAuthenticationUseCase.name,
-      );
+      const refreshAuthenticationUseCase = this._container
+        .getInstance(RefreshAuthenticationUseCase.name);
       const accessToken = await refreshAuthenticationUseCase.execute(req.body);
 
       res.json({
@@ -53,9 +47,7 @@ class AuthenticationsHandler {
 
   async deleteAuthenticationHandler(req, res, next) {
     try {
-      const logoutUserUseCase = this._container.getInstance(
-        LogoutUserUseCase.name,
-      );
+      const logoutUserUseCase = this._container.getInstance(LogoutUserUseCase.name);
       await logoutUserUseCase.execute(req.body);
 
       res.json({

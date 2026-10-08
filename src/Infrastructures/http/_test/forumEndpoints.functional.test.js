@@ -21,27 +21,12 @@ describe('forum HTTP functional API', () => {
     const otherUsername = `functional-${nanoid()}`;
     await pool.query(
       'INSERT INTO users (id, username, password, fullname) VALUES ($1, $2, $3, $4), ($5, $6, $7, $8)',
-      [
-        ownerId,
-        ownerUsername,
-        'hash',
-        'Owner',
-        otherOwnerId,
-        otherUsername,
-        'hash',
-        'Other',
-      ],
+      [ownerId, ownerUsername, 'hash', 'Owner', otherOwnerId, otherUsername, 'hash', 'Other'],
     );
 
     const tokenManager = container.getInstance(AuthenticationTokenManager.name);
-    ownerToken = await tokenManager.createAccessToken({
-      id: ownerId,
-      username: ownerUsername,
-    });
-    otherOwnerToken = await tokenManager.createAccessToken({
-      id: otherOwnerId,
-      username: otherUsername,
-    });
+    ownerToken = await tokenManager.createAccessToken({ id: ownerId, username: ownerUsername });
+    otherOwnerToken = await tokenManager.createAccessToken({ id: otherOwnerId, username: otherUsername });
     app = await createServer(container);
 
     threadId = `thread-${nanoid()}`;
@@ -55,9 +40,7 @@ describe('forum HTTP functional API', () => {
   });
 
   afterEach(async () => {
-    await pool.query('DELETE FROM users WHERE id = ANY($1::varchar[])', [
-      [ownerId, otherOwnerId],
-    ]);
+    await pool.query('DELETE FROM users WHERE id = ANY($1::varchar[])', [[ownerId, otherOwnerId]]);
   });
 
   afterAll(async () => {
@@ -65,9 +48,7 @@ describe('forum HTTP functional API', () => {
   });
 
   it('should create and read a thread, reject invalid access, and return 404 for missing threads', async () => {
-    const noToken = await request(app)
-      .post('/threads')
-      .send({ title: 'title', body: 'body' });
+    const noToken = await request(app).post('/threads').send({ title: 'title', body: 'body' });
     expect(noToken.status).toBe(401);
     expect(noToken.body.message).toBe('Missing authentication');
 
@@ -89,11 +70,7 @@ describe('forum HTTP functional API', () => {
     const created = await request(app)
       .post('/threads')
       .set('Authorization', `Bearer ${ownerToken}`)
-      .send({
-        title: 'Created thread',
-        body: 'Created body',
-        owner: otherOwnerId,
-      });
+      .send({ title: 'Created thread', body: 'Created body', owner: otherOwnerId });
     expect(created.status).toBe(201);
     expect(created.body.data.addedThread).toMatchObject({
       title: 'Created thread',
@@ -101,9 +78,7 @@ describe('forum HTTP functional API', () => {
     });
     expect(created.body.data.addedThread.id).not.toBe('');
 
-    const detail = await request(app).get(
-      `/threads/${created.body.data.addedThread.id}`,
-    );
+    const detail = await request(app).get(`/threads/${created.body.data.addedThread.id}`);
     expect(detail.status).toBe(200);
     expect(detail.body.data.thread).toMatchObject({
       id: created.body.data.addedThread.id,
@@ -120,9 +95,7 @@ describe('forum HTTP functional API', () => {
   });
 
   it('should validate comment resources, enforce ownership, and soft-delete comments', async () => {
-    const anonymous = await request(app)
-      .post(`/threads/${threadId}/comments`)
-      .send({ content: 'comment' });
+    const anonymous = await request(app).post(`/threads/${threadId}/comments`).send({ content: 'comment' });
     expect(anonymous.status).toBe(401);
 
     for (const payload of [null, {}, { content: ' \t ' }, { content: 123 }]) {
@@ -177,19 +150,10 @@ describe('forum HTTP functional API', () => {
       [commentId],
     );
     expect(persisted.rows).toEqual([{ id: commentId, is_delete: true }]);
-    const deletedCommentLike = await request(app)
-      .put(`/threads/${threadId}/comments/${commentId}/likes`)
-      .set('Authorization', `Bearer ${ownerToken}`);
-    expect(deletedCommentLike.status).toBe(404);
 
     const detail = await request(app).get(`/threads/${threadId}`);
     expect(detail.body.data.thread.comments).toMatchObject([
-      {
-        id: commentId,
-        content: '**komentar telah dihapus**',
-        replies: [],
-        likeCount: 0,
-      },
+      { id: commentId, content: '**komentar telah dihapus**', replies: [] },
     ]);
   });
 
@@ -242,16 +206,12 @@ describe('forum HTTP functional API', () => {
     expect(created.body.data.addedReply.owner).toBe(otherOwnerId);
 
     const missingReply = await request(app)
-      .delete(
-        `/threads/${threadId}/comments/${commentId}/replies/missing-reply`,
-      )
+      .delete(`/threads/${threadId}/comments/${commentId}/replies/missing-reply`)
       .set('Authorization', `Bearer ${otherOwnerToken}`);
     expect(missingReply.status).toBe(404);
 
     const wrongComment = await request(app)
-      .delete(
-        `/threads/${threadId}/comments/missing-comment/replies/${replyId}`,
-      )
+      .delete(`/threads/${threadId}/comments/missing-comment/replies/${replyId}`)
       .set('Authorization', `Bearer ${otherOwnerToken}`);
     expect(wrongComment.status).toBe(404);
 
@@ -276,90 +236,5 @@ describe('forum HTTP functional API', () => {
     expect(detail.body.data.thread.comments[0].replies).toMatchObject([
       { id: replyId, content: '**balasan telah dihapus**' },
     ]);
-  });
-
-  it('should authenticate likes, toggle them per user, and expose database counts', async () => {
-    const commentResponse = await request(app)
-      .post(`/threads/${threadId}/comments`)
-      .set('Authorization', `Bearer ${ownerToken}`)
-      .send({ content: 'likeable comment' });
-    const commentId = commentResponse.body.data.addedComment.id;
-    const likeUrl = `/threads/${threadId}/comments/${commentId}/likes`;
-
-    const initialDetail = await request(app).get(`/threads/${threadId}`);
-    expect(initialDetail.body.data.thread.comments[0]).toMatchObject({
-      id: commentId,
-      likeCount: 0,
-    });
-
-    const unauthorized = await request(app).put(likeUrl);
-    expect(unauthorized.status).toBe(401);
-    expect(unauthorized.body).toMatchObject({
-      status: 'fail',
-      message: expect.any(String),
-    });
-
-    const missingThread = await request(app)
-      .put(`/threads/missing-thread/comments/${commentId}/likes`)
-      .set('Authorization', `Bearer ${ownerToken}`);
-    expect(missingThread.status).toBe(404);
-
-    const missingComment = await request(app)
-      .put(`/threads/${threadId}/comments/missing-comment/likes`)
-      .set('Authorization', `Bearer ${ownerToken}`);
-    expect(missingComment.status).toBe(404);
-
-    const wrongParent = await request(app)
-      .put(`/threads/${otherThreadId}/comments/${commentId}/likes`)
-      .set('Authorization', `Bearer ${ownerToken}`);
-    expect(wrongParent.status).toBe(404);
-
-    const firstLike = await request(app)
-      .put(likeUrl)
-      .set('Authorization', `Bearer ${ownerToken}`);
-    expect(firstLike.status).toBe(200);
-    expect(firstLike.body).toEqual({ status: 'success' });
-    await expect(
-      request(app).get(`/threads/${threadId}`),
-    ).resolves.toMatchObject({
-      body: {
-        data: {
-          thread: {
-            comments: [
-              expect.objectContaining({ id: commentId, likeCount: 1 }),
-            ],
-          },
-        },
-      },
-    });
-
-    const secondUserLike = await request(app)
-      .put(likeUrl)
-      .set('Authorization', `Bearer ${otherOwnerToken}`);
-    expect(secondUserLike.status).toBe(200);
-    let detail = await request(app).get(`/threads/${threadId}`);
-    expect(detail.body.data.thread.comments[0].likeCount).toBe(2);
-
-    const firstUserUnlike = await request(app)
-      .put(likeUrl)
-      .set('Authorization', `Bearer ${ownerToken}`);
-    expect(firstUserUnlike.status).toBe(200);
-    detail = await request(app).get(`/threads/${threadId}`);
-    expect(detail.body.data.thread.comments[0].likeCount).toBe(1);
-
-    const secondUserUnlike = await request(app)
-      .put(likeUrl)
-      .set('Authorization', `Bearer ${otherOwnerToken}`);
-    expect(secondUserUnlike.status).toBe(200);
-    detail = await request(app).get(`/threads/${threadId}`);
-    expect(detail.body.data.thread.comments[0].likeCount).toBe(0);
-
-    const concurrentToggles = await Promise.all([
-      request(app).put(likeUrl).set('Authorization', `Bearer ${ownerToken}`),
-      request(app).put(likeUrl).set('Authorization', `Bearer ${ownerToken}`),
-    ]);
-    expect(concurrentToggles.map(({ status }) => status)).toEqual([200, 200]);
-    detail = await request(app).get(`/threads/${threadId}`);
-    expect(detail.body.data.thread.comments[0].likeCount).toBe(0);
   });
 });

@@ -1,13 +1,6 @@
 node_modules
-# package-lock.json
+package-lock.json
 .idea
-.env.*
-.vscode/
-!.env.example
 config/database/test.json
-config/database/production.json
 coverage
-*.pem
-*.key
-service-account*.json
 .env

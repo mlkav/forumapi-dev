@@ -6,41 +6,35 @@
   "main": "index.js",
   "scripts": {
     "start": "node src/app.js",
-    "start:dev": "node --watch src/app.js",
-    "start:test": "NODE_ENV=test node src/app.js",
+    "start:dev": "nodemon src/app.js",
     "test": "NODE_ENV=test TEST_PGDATABASE=forumapi_test vitest --run",
     "test:watch": "NODE_ENV=test TEST_PGDATABASE=forumapi_test vitest --watch",
     "test:coverage": "NODE_ENV=test TEST_PGDATABASE=forumapi_test vitest --coverage",
     "migrate": "node-pg-migrate",
     "migrate:test": "NODE_ENV=test PGDATABASE=forumapi_test node-pg-migrate",
-    "create-db:prod": "node ./scripts/create-db-prod.js",
-    "create-db:test": "node ./scripts/create-db-test.js",
-    "lint": "eslint ./",
-    "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "lint": "eslint ./"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bcrypt": "^6.0.0",
-    "dotenv": "^16.6.1",
     "express": "^5.0.1",
-    "instances-container": "^2.0.6",
     "jsonwebtoken": "^9.0.2",
-    "nanoid": "^5.1.16",
-    "node-pg-migrate": "^8.0.4",
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.6.1",
+    "instances-container": "^2.0.6",
+    "nanoid": "^5.0.9",
     "pg": "^8.16.3"
   },
   "devDependencies": {
-    "@eslint/js": "^9.38.0",
-    "@vitest/coverage-v8": "^4.1.11",
-    "@vitest/eslint-plugin": "^1.3.26",
     "eslint": "^9.38.0",
+    "@eslint/js": "^9.38.0",
+    "@vitest/eslint-plugin": "^1.3.26",
     "eslint-config-dicodingacademy": "^0.9.5",
-    "eslint-config-prettier": "^10.1.8",
-    "prettier": "^3.9.9",
-    "supertest": "^7.1.4",
-    "vitest": "^4.1.11"
+    "node-pg-migrate": "^8.0.4",
+    "nodemon": "^3.1.9",
+    "vitest": "^4.0.17",
+    "@vitest/coverage-v8": "^4.0.17",
+    "supertest": "^7.1.4"
   }
 }

@@ -12,9 +12,6 @@ const createServer = async (container) => {
   app.use(express.json());
 
   // Register routes
-  app.get('/health', (_req, res) => {
-    res.json({ status: 'success', timestamp: new Date().toISOString() });
-  });
   app.use('/users', users(container));
   app.use('/authentications', authentications(container));
   app.use('/threads', threads(container));

@@ -50,9 +50,7 @@ class CommentRepositoryPostgres extends CommentRepository {
 
   async getCommentsByThreadId(threadId) {
     const result = await this._pool.query({
-      text: `SELECT comments.id, users.username, comments.date, comments.content, comments.is_delete,
-          (SELECT COUNT(*)::integer FROM comment_likes
-            WHERE comment_likes.comment_id = comments.id) AS like_count
+      text: `SELECT comments.id, users.username, comments.date, comments.content, comments.is_delete
         FROM comments
         JOIN users ON users.id = comments.owner
         WHERE comments.thread_id = $1

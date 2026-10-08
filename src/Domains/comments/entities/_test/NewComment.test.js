@@ -1,23 +1,17 @@
 import NewComment from '../NewComment.js';
 
 describe('NewComment entity', () => {
-  it.each([undefined, null, [], {}])(
-    'should reject a missing or invalid payload: %s',
-    (payload) => {
-      expect(() => new NewComment(payload)).toThrowError(
-        'NEW_COMMENT.NOT_CONTAIN_NEEDED_PROPERTY',
-      );
-    },
-  );
+  it.each([undefined, null, [], {}])('should reject a missing or invalid payload: %s', (payload) => {
+    expect(() => new NewComment(payload))
+      .toThrowError('NEW_COMMENT.NOT_CONTAIN_NEEDED_PROPERTY');
+  });
 
   it('should throw error when payload does not contain needed property', () => {
     // Arrange
     const payload = {};
 
     // Action & Assert
-    expect(() => new NewComment(payload)).toThrowError(
-      'NEW_COMMENT.NOT_CONTAIN_NEEDED_PROPERTY',
-    );
+    expect(() => new NewComment(payload)).toThrowError('NEW_COMMENT.NOT_CONTAIN_NEEDED_PROPERTY');
   });
 
   it('should throw error when payload does not meet data type specification', () => {
@@ -27,9 +21,7 @@ describe('NewComment entity', () => {
     };
 
     // Action & Assert
-    expect(() => new NewComment(payload)).toThrowError(
-      'NEW_COMMENT.NOT_MEET_DATA_TYPE_SPECIFICATION',
-    );
+    expect(() => new NewComment(payload)).toThrowError('NEW_COMMENT.NOT_MEET_DATA_TYPE_SPECIFICATION');
   });
 
   it('should create NewComment object correctly', () => {
@@ -46,8 +38,7 @@ describe('NewComment entity', () => {
   });
 
   it('should reject whitespace-only content', () => {
-    expect(() => new NewComment({ content: '  ' })).toThrowError(
-      'NEW_COMMENT.NOT_CONTAIN_NEEDED_PROPERTY',
-    );
+    expect(() => new NewComment({ content: '  ' }))
+      .toThrowError('NEW_COMMENT.NOT_CONTAIN_NEEDED_PROPERTY');
   });
 });

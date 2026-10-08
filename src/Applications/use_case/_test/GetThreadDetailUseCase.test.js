@@ -23,7 +23,6 @@ describe('GetThreadDetailUseCase', () => {
         date: '2021-08-08T07:22:33.555Z',
         content: 'sebuah comment 1',
         is_delete: false,
-        like_count: 2,
       },
       {
         id: 'comment-2',
@@ -31,7 +30,6 @@ describe('GetThreadDetailUseCase', () => {
         date: '2021-08-08T07:26:33.555Z',
         content: 'sebuah comment 2',
         is_delete: true,
-        like_count: 0,
       },
     ];
 
@@ -58,15 +56,9 @@ describe('GetThreadDetailUseCase', () => {
     const mockCommentRepository = new CommentRepository();
     const mockReplyRepository = new ReplyRepository();
 
-    mockThreadRepository.getThreadById = vi
-      .fn()
-      .mockImplementation(() => Promise.resolve(mockThread));
-    mockCommentRepository.getCommentsByThreadId = vi
-      .fn()
-      .mockImplementation(() => Promise.resolve(mockComments));
-    mockReplyRepository.getRepliesByThreadId = vi
-      .fn()
-      .mockImplementation(() => Promise.resolve(mockReplies));
+    mockThreadRepository.getThreadById = vi.fn().mockImplementation(() => Promise.resolve(mockThread));
+    mockCommentRepository.getCommentsByThreadId = vi.fn().mockImplementation(() => Promise.resolve(mockComments));
+    mockReplyRepository.getRepliesByThreadId = vi.fn().mockImplementation(() => Promise.resolve(mockReplies));
 
     const getThreadDetailUseCase = new GetThreadDetailUseCase({
       threadRepository: mockThreadRepository,
@@ -104,7 +96,6 @@ describe('GetThreadDetailUseCase', () => {
               username: 'alex',
             },
           ],
-          likeCount: 2,
         },
         {
           id: 'comment-2',
@@ -112,16 +103,11 @@ describe('GetThreadDetailUseCase', () => {
           date: '2021-08-08T07:26:33.555Z',
           content: '**komentar telah dihapus**',
           replies: [],
-          likeCount: 0,
         },
       ],
     });
     expect(mockThreadRepository.getThreadById).toHaveBeenCalledWith(threadId);
-    expect(mockCommentRepository.getCommentsByThreadId).toHaveBeenCalledWith(
-      threadId,
-    );
-    expect(mockReplyRepository.getRepliesByThreadId).toHaveBeenCalledWith(
-      threadId,
-    );
+    expect(mockCommentRepository.getCommentsByThreadId).toHaveBeenCalledWith(threadId);
+    expect(mockReplyRepository.getRepliesByThreadId).toHaveBeenCalledWith(threadId);
   });
 });

@@ -13,18 +13,10 @@ describe('DeleteCommentUseCase', () => {
     const mockThreadRepository = new ThreadRepository();
     const mockCommentRepository = new CommentRepository();
 
-    mockThreadRepository.checkAvailabilityThread = vi
-      .fn()
-      .mockImplementation(() => Promise.resolve());
-    mockCommentRepository.checkAvailabilityComment = vi
-      .fn()
-      .mockImplementation(() => Promise.resolve());
-    mockCommentRepository.verifyCommentOwner = vi
-      .fn()
-      .mockImplementation(() => Promise.resolve());
-    mockCommentRepository.deleteComment = vi
-      .fn()
-      .mockImplementation(() => Promise.resolve());
+    mockThreadRepository.checkAvailabilityThread = vi.fn().mockImplementation(() => Promise.resolve());
+    mockCommentRepository.checkAvailabilityComment = vi.fn().mockImplementation(() => Promise.resolve());
+    mockCommentRepository.verifyCommentOwner = vi.fn().mockImplementation(() => Promise.resolve());
+    mockCommentRepository.deleteComment = vi.fn().mockImplementation(() => Promise.resolve());
 
     const deleteCommentUseCase = new DeleteCommentUseCase({
       threadRepository: mockThreadRepository,
@@ -35,17 +27,9 @@ describe('DeleteCommentUseCase', () => {
     await deleteCommentUseCase.execute(threadId, commentId, owner);
 
     // Assert
-    expect(mockThreadRepository.checkAvailabilityThread).toHaveBeenCalledWith(
-      threadId,
-    );
-    expect(mockCommentRepository.checkAvailabilityComment).toHaveBeenCalledWith(
-      commentId,
-      threadId,
-    );
-    expect(mockCommentRepository.verifyCommentOwner).toHaveBeenCalledWith(
-      commentId,
-      owner,
-    );
+    expect(mockThreadRepository.checkAvailabilityThread).toHaveBeenCalledWith(threadId);
+    expect(mockCommentRepository.checkAvailabilityComment).toHaveBeenCalledWith(commentId, threadId);
+    expect(mockCommentRepository.verifyCommentOwner).toHaveBeenCalledWith(commentId, owner);
     expect(mockCommentRepository.deleteComment).toHaveBeenCalledWith(commentId);
   });
 });

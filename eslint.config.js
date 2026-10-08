@@ -1,10 +1,8 @@
 import js from '@eslint/js';
 import { defineConfig } from 'eslint/config';
-
 import daStyle from 'eslint-config-dicodingacademy';
 import vitest from '@vitest/eslint-plugin';
 import globals from 'globals';
-import prettierConfig from 'eslint-config-prettier';
 
 export default defineConfig([
   {
@@ -12,30 +10,17 @@ export default defineConfig([
       vitest,
     },
   },
-
   daStyle,
-
   {
     files: ['**/*.{js,mjs,cjs}'],
-
-    plugins: {
-      js,
-    },
-
+    plugins: { js },
     extends: ['js/recommended'],
-
     languageOptions: {
-      globals: {
-        ...vitest.environments.env.globals,
-        ...globals.node,
-      },
+      globals: { ...vitest.environments.env.globals, ...globals.node },
     },
-
     rules: {
       camelcase: ['error', { properties: 'never' }],
       'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     },
   },
-
-  prettierConfig,
 ]);

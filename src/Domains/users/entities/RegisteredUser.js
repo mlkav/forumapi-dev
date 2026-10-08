@@ -14,11 +14,7 @@ class RegisteredUser {
       throw new Error('REGISTERED_USER.NOT_CONTAIN_NEEDED_PROPERTY');
     }
 
-    if (
-      typeof id !== 'string' ||
-      typeof username !== 'string' ||
-      typeof fullname !== 'string'
-    ) {
+    if (typeof id !== 'string' || typeof username !== 'string' || typeof fullname !== 'string') {
       throw new Error('REGISTERED_USER.NOT_MEET_DATA_TYPE_SPECIFICATION');
     }
   }

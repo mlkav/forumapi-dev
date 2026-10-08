@@ -26,21 +26,13 @@ describe('AddReplyUseCase', () => {
     const mockCommentRepository = new CommentRepository();
     const mockReplyRepository = new ReplyRepository();
 
-    mockThreadRepository.checkAvailabilityThread = vi
-      .fn()
-      .mockImplementation(() => Promise.resolve());
-    mockCommentRepository.checkAvailabilityComment = vi
-      .fn()
-      .mockImplementation(() => Promise.resolve());
-    mockReplyRepository.addReply = vi.fn().mockImplementation(() =>
-      Promise.resolve(
-        new AddedReply({
-          id: 'reply-123',
-          content: 'sebuah balasan',
-          owner: 'user-123',
-        }),
-      ),
-    );
+    mockThreadRepository.checkAvailabilityThread = vi.fn().mockImplementation(() => Promise.resolve());
+    mockCommentRepository.checkAvailabilityComment = vi.fn().mockImplementation(() => Promise.resolve());
+    mockReplyRepository.addReply = vi.fn().mockImplementation(() => Promise.resolve(new AddedReply({
+      id: 'reply-123',
+      content: 'sebuah balasan',
+      owner: 'user-123',
+    })));
 
     const addReplyUseCase = new AddReplyUseCase({
       threadRepository: mockThreadRepository,
@@ -49,28 +41,14 @@ describe('AddReplyUseCase', () => {
     });
 
     // Action
-    const addedReply = await addReplyUseCase.execute(
-      useCasePayload,
-      threadId,
-      commentId,
-      owner,
-    );
+    const addedReply = await addReplyUseCase.execute(useCasePayload, threadId, commentId, owner);
 
     // Assert
     expect(addedReply).toEqual(expectedAddedReply);
-    expect(mockThreadRepository.checkAvailabilityThread).toHaveBeenCalledWith(
-      threadId,
-    );
-    expect(mockCommentRepository.checkAvailabilityComment).toHaveBeenCalledWith(
-      commentId,
-      threadId,
-    );
-    expect(mockReplyRepository.addReply).toHaveBeenCalledWith(
-      new NewReply({
-        content: useCasePayload.content,
-      }),
-      commentId,
-      owner,
-    );
+    expect(mockThreadRepository.checkAvailabilityThread).toHaveBeenCalledWith(threadId);
+    expect(mockCommentRepository.checkAvailabilityComment).toHaveBeenCalledWith(commentId, threadId);
+    expect(mockReplyRepository.addReply).toHaveBeenCalledWith(new NewReply({
+      content: useCasePayload.content,
+    }), commentId, owner);
   });
 });

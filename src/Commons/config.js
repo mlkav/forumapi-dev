@@ -2,8 +2,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-export const getTestDatabaseName = (databaseName) =>
-  databaseName || 'forumapi_test';
+export const getTestDatabaseName = (databaseName) => databaseName || 'forumapi_test';
 const testDatabaseName = getTestDatabaseName(process.env.TEST_PGDATABASE);
 
 export const isTestEnvironment = () => process.env.NODE_ENV === 'test';
@@ -11,9 +10,7 @@ const isTest = isTestEnvironment();
 
 export const assertTestDatabase = (isTest, databaseName) => {
   if (isTest && !/_test$/i.test(databaseName)) {
-    throw new Error(
-      'TEST_PGDATABASE must use a database name ending in "_test"',
-    );
+    throw new Error('TEST_PGDATABASE must use a database name ending in "_test"');
   }
 };
 

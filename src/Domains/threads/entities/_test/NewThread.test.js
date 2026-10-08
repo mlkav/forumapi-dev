@@ -1,14 +1,10 @@
 import NewThread from '../NewThread.js';
 
 describe('NewThread entity', () => {
-  it.each([undefined, null, [], {}])(
-    'should reject a missing or invalid payload: %s',
-    (payload) => {
-      expect(() => new NewThread(payload)).toThrowError(
-        'NEW_THREAD.NOT_CONTAIN_NEEDED_PROPERTY',
-      );
-    },
-  );
+  it.each([undefined, null, [], {}])('should reject a missing or invalid payload: %s', (payload) => {
+    expect(() => new NewThread(payload))
+      .toThrowError('NEW_THREAD.NOT_CONTAIN_NEEDED_PROPERTY');
+  });
 
   it('should throw error when payload does not contain needed property', () => {
     // Arrange
@@ -17,9 +13,7 @@ describe('NewThread entity', () => {
     };
 
     // Action & Assert
-    expect(() => new NewThread(payload)).toThrowError(
-      'NEW_THREAD.NOT_CONTAIN_NEEDED_PROPERTY',
-    );
+    expect(() => new NewThread(payload)).toThrowError('NEW_THREAD.NOT_CONTAIN_NEEDED_PROPERTY');
   });
 
   it('should throw error when payload does not meet data type specification', () => {
@@ -30,9 +24,7 @@ describe('NewThread entity', () => {
     };
 
     // Action & Assert
-    expect(() => new NewThread(payload)).toThrowError(
-      'NEW_THREAD.NOT_MEET_DATA_TYPE_SPECIFICATION',
-    );
+    expect(() => new NewThread(payload)).toThrowError('NEW_THREAD.NOT_MEET_DATA_TYPE_SPECIFICATION');
   });
 
   it('should create NewThread object correctly', () => {
@@ -51,11 +43,9 @@ describe('NewThread entity', () => {
   });
 
   it('should reject whitespace-only values', () => {
-    expect(() => new NewThread({ title: '  ', body: 'body' })).toThrowError(
-      'NEW_THREAD.NOT_CONTAIN_NEEDED_PROPERTY',
-    );
-    expect(() => new NewThread({ title: 'title', body: '\t' })).toThrowError(
-      'NEW_THREAD.NOT_CONTAIN_NEEDED_PROPERTY',
-    );
+    expect(() => new NewThread({ title: '  ', body: 'body' }))
+      .toThrowError('NEW_THREAD.NOT_CONTAIN_NEEDED_PROPERTY');
+    expect(() => new NewThread({ title: 'title', body: '\t' }))
+      .toThrowError('NEW_THREAD.NOT_CONTAIN_NEEDED_PROPERTY');
   });
 });

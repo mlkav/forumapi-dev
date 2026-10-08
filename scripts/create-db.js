@@ -3,12 +3,10 @@ import pg from 'pg';
 
 const { Client } = pg;
 
-const databaseName = process.env.PGDATABASE_TEST || 'forumapi_test';
+const databaseName = process.env.TEST_PGDATABASE || 'forumapi_test';
 
 if (!/_test$/i.test(databaseName)) {
-  throw new Error(
-    'Database setup is restricted to databases ending in "_test"',
-  );
+  throw new Error('Database setup is restricted to databases ending in "_test"');
 }
 
 const connectionConfig = {

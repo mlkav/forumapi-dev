@@ -1,3 +1,4 @@
+
 export const up = (pgm) => {
   pgm.createTable('users', {
     id: {

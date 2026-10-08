@@ -31,18 +31,14 @@ describe('thread authentication middleware', () => {
       const { next, container } = await runMiddleware(header);
 
       expect(next).toHaveBeenCalledWith(expect.any(AuthenticationError));
-      expect(next.mock.calls[0][0].message).toBe(
-        'Invalid authentication credentials',
-      );
+      expect(next.mock.calls[0][0].message).toBe('Invalid authentication credentials');
       expect(container.getInstance).not.toHaveBeenCalled();
     },
   );
 
   it('should translate invalid access tokens into authentication errors', async () => {
     const { next } = await runMiddleware('Bearer token', {
-      verifyAccessToken: vi
-        .fn()
-        .mockRejectedValue(new InvariantError('invalid token')),
+      verifyAccessToken: vi.fn().mockRejectedValue(new InvariantError('invalid token')),
     });
 
     expect(next).toHaveBeenCalledWith(expect.any(AuthenticationError));
@@ -57,33 +53,31 @@ describe('thread authentication middleware', () => {
     expect(next).toHaveBeenCalledWith(error);
   });
 
-  it.each([undefined, null, 'invalid payload', {}, { id: 123 }])(
-    'should reject tokens without a string user id: %s',
-    async (payload) => {
-      const tokenManager = {
-        verifyAccessToken: vi.fn().mockResolvedValue(undefined),
-        decodePayload: vi.fn().mockResolvedValue(payload),
-      };
-      const { next } = await runMiddleware('Bearer token', tokenManager);
+  it.each([
+    undefined,
+    null,
+    'invalid payload',
+    {},
+    { id: 123 },
+  ])('should reject tokens without a string user id: %s', async (payload) => {
+    const tokenManager = {
+      verifyAccessToken: vi.fn().mockResolvedValue(undefined),
+      decodePayload: vi.fn().mockResolvedValue(payload),
+    };
+    const { next } = await runMiddleware('Bearer token', tokenManager);
 
-      expect(tokenManager.verifyAccessToken).toHaveBeenCalledWith('token');
-      expect(next).toHaveBeenCalledWith(expect.any(AuthenticationError));
-    },
-  );
+    expect(tokenManager.verifyAccessToken).toHaveBeenCalledWith('token');
+    expect(next).toHaveBeenCalledWith(expect.any(AuthenticationError));
+  });
 
   it('should attach the token user and continue', async () => {
     const tokenManager = {
       verifyAccessToken: vi.fn().mockResolvedValue(undefined),
       decodePayload: vi.fn().mockResolvedValue({ id: 'user-123' }),
     };
-    const { req, next, container } = await runMiddleware(
-      'Bearer token',
-      tokenManager,
-    );
+    const { req, next, container } = await runMiddleware('Bearer token', tokenManager);
 
-    expect(container.getInstance).toHaveBeenCalledWith(
-      AuthenticationTokenManager.name,
-    );
+    expect(container.getInstance).toHaveBeenCalledWith(AuthenticationTokenManager.name);
     expect(req.auth).toEqual({ id: 'user-123' });
     expect(next).toHaveBeenCalledWith();
   });
